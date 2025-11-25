@@ -7,8 +7,8 @@ import { EffectComposer } from "three/addons/postprocessing/EffectComposer.js";
 import { RenderPass } from "three/addons/postprocessing/RenderPass.js";
 import { UnrealBloomPass } from "three/addons/postprocessing/UnrealBloomPass.js";
 
-// Advanced 4D Simplex noise GLSL implementation with derivatives
-// Based on Ashima Arts and David Li's implementations
+// 4D Simplex noise GLSL implementation with derivatives
+// Based on Ashima Arts and David Li's implementations, very cool work!
 const simplexNoise4D = `
 #define F4 0.309016994374947451
 
@@ -518,33 +518,29 @@ export default function BoilingStar() {
 		);
 		const bloomPass = new UnrealBloomPass(
 			bloomResolution,
-			2.2, // Strength - increased for dramatic flares
-			0.5, // Radius
-			0.05, // Threshold - lower to catch more glow
+			2.2, // strength for dramatic flares
+			0.5, // radius
+			0.05, // lower for more glow
 		);
 		composer.addPass(bloomPass);
 
-		// Animation loop
-		let animationId: number;
-		function animate(time: number) {
-			const t = time * 0.001;
+	let time = 0;
+	function animate() {
+		time += 0.016; // 60fps delta
 
-			starMaterial.uniforms.uTime.value = t;
-			coronaMaterial.uniforms.uTime.value = t;
-			flareMaterial.uniforms.uTime.value = t;
+		starMaterial.uniforms.uTime.value = time;
+		coronaMaterial.uniforms.uTime.value = time;
+		flareMaterial.uniforms.uTime.value = time;
 
-			// Subtle rotation
-			star.rotation.y += 0.001;
-			corona.rotation.y -= 0.0008;
-			corona.rotation.x += 0.0005;
+		star.rotation.y += 0.001;
+		corona.rotation.y -= 0.0008;
+		corona.rotation.x += 0.0005;
 
-			controls.update();
-			composer.render();
+		controls.update();
+		composer.render();
+	}
 
-			animationId = requestAnimationFrame(animate);
-		}
-
-		animate(0);
+	renderer.setAnimationLoop(animate);
 
 		const handleResize = () => {
 			const w = window.innerWidth;
@@ -561,22 +557,22 @@ export default function BoilingStar() {
 
 		window.addEventListener("resize", handleResize);
 
-		return () => {
-			window.removeEventListener("resize", handleResize);
-			cancelAnimationFrame(animationId);
-			controls.dispose();
-			starGeometry.dispose();
-			starMaterial.dispose();
-			coronaGeometry.dispose();
-			coronaMaterial.dispose();
-			flareGeometry.dispose();
-			flareMaterial.dispose();
-			renderer.dispose();
+	return () => {
+		window.removeEventListener("resize", handleResize);
+		renderer.setAnimationLoop(null);
+		controls.dispose();
+		starGeometry.dispose();
+		starMaterial.dispose();
+		coronaGeometry.dispose();
+		coronaMaterial.dispose();
+		flareGeometry.dispose();
+		flareMaterial.dispose();
+		renderer.dispose();
 
-			if (containerRef.current) {
-				containerRef.current.innerHTML = "";
-			}
-		};
+		if (containerRef.current) {
+			containerRef.current.innerHTML = "";
+		}
+	};
 	}, []);
 
 	return <div ref={containerRef} className="w-full h-full" />;
