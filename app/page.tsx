@@ -129,17 +129,17 @@ export default function Home() {
 						</div>
 					</Link>
 
-					{/* Strange Attractors Card */}
+					{/* Particle Network Card */}
 					<Link
-						href="/examples/strange-attractors"
+						href="/examples/particle-network"
 						className="group block border border-border bg-black/40 backdrop-blur-sm overflow-hidden hover:border-foreground/40 hover:bg-black/60 transition-all duration-200"
 					>
 						<div className="aspect-video bg-black relative overflow-hidden border-b border-border">
-							<div className="absolute inset-0 flex items-center justify-center text-5xl font-bold text-purple-400/30 font-mono">
-								∞
+							<div className="absolute inset-0 flex items-center justify-center text-6xl font-bold text-white/20 font-mono">
+								⬡⬢⬡
 							</div>
 							<div className="absolute top-3 right-3 px-2 py-1 bg-black/80 text-[10px] border border-white/20 font-mono tracking-wider">
-								[CHAOS]
+								[PARTICLES]
 							</div>
 							<div className="absolute bottom-3 left-3 text-[8px] font-mono text-white/40">
 								003/DEMO
@@ -149,7 +149,7 @@ export default function Home() {
 						<div className="p-5 space-y-3">
 							<div className="flex items-center justify-between">
 								<h3 className="text-lg font-semibold font-mono tracking-tight group-hover:text-white transition-colors">
-									strange_attractors
+									particle_network
 								</h3>
 								<span className="text-xs text-muted-foreground font-mono">
 									▸
@@ -157,19 +157,20 @@ export default function Home() {
 							</div>
 
 							<p className="text-xs text-muted-foreground leading-relaxed font-mono">
-								lorenz, rössler, and aizawa chaotic systems visualized as
-								flowing particle streams with mathematical formulas overlay.
+								dynamic particle system using buffergeometry drawrange.
+								particles connect within proximity, creating organic network
+								visualizations.
 							</p>
 
 							<div className="flex flex-wrap gap-2 pt-2">
 								<span className="text-[10px] px-2 py-0.5 bg-black/60 text-white/60 border border-white/10 font-mono">
-									chaos
-								</span>
-								<span className="text-[10px] px-2 py-0.5 bg-black/60 text-white/60 border border-white/10 font-mono">
 									particles
 								</span>
 								<span className="text-[10px] px-2 py-0.5 bg-black/60 text-white/60 border border-white/10 font-mono">
-									math
+									drawrange
+								</span>
+								<span className="text-[10px] px-2 py-0.5 bg-black/60 text-white/60 border border-white/10 font-mono">
+									dynamic
 								</span>
 							</div>
 
