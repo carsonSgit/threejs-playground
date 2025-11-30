@@ -5,4 +5,13 @@
  * You can delete this file once you add your own workflows.
  */
 
-export default {};
+import knowledge from "../knowledge";
+import { Workflow } from "@botpress/runtime";
+
+export default new Workflow({
+    name: "refresh-knowledge",
+    schedule: "0 0 * * *",
+    handler: async () => {
+        await knowledge.refresh();
+    }
+});

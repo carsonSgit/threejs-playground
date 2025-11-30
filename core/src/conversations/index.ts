@@ -1,4 +1,5 @@
 import { Conversation } from "@botpress/runtime";
+import knowledge from "../knowledge";
 
 export default new Conversation({
   channel: "*",
@@ -13,6 +14,8 @@ export default new Conversation({
       - Providing guidance on running the project locally
 
       The project is built with Next.js, TypeScript, and Three.js. Keep responses concise and code-focused when relevant.`,
-    });
+      knowledge: [knowledge],
+    },
+  );
   },
 });
