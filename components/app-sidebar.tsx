@@ -1,7 +1,9 @@
 "use client";
 
 import { useState, useEffect } from "react";
-import { ChevronDown, Bot, AlertCircle, X } from "lucide-react";
+import { usePathname } from "next/navigation";
+import Link from "next/link";
+import { ChevronDown, Bot, AlertCircle, X, ArrowLeft } from "lucide-react";
 import {
   Sidebar,
   SidebarContent,
@@ -27,6 +29,8 @@ function SidebarInner() {
   const [chatVisible, setChatVisible] = useState(true);
   const [botpressStatus, setBotpressStatus] = useState<"loading" | "ready" | "error">("loading");
   const { state, toggleSidebar } = useSidebar();
+  const pathname = usePathname();
+  const isExamplePage = pathname.startsWith("/examples");
 
   useEffect(() => {
     let attempts = 0;
@@ -71,6 +75,22 @@ function SidebarInner() {
     <SidebarContent>
       <SidebarGroup>
         <SidebarMenu className="gap-0">
+          {/* Back to Examples - only shown on example pages */}
+          {isExamplePage && (
+            <SidebarMenuItem>
+              <SidebarMenuButton
+                asChild
+                tooltip="Back to Examples"
+                className="font-mono text-xs rounded-none border-0 hover:bg-sidebar-accent/30"
+              >
+                <Link href="/">
+                  <ArrowLeft className="h-4 w-4 shrink-0" />
+                  <span>back_to_examples</span>
+                </Link>
+              </SidebarMenuButton>
+            </SidebarMenuItem>
+          )}
+          
           <SidebarMenuItem>
             {/* Row container for bot button + close button */}
             <div className="flex items-center">
