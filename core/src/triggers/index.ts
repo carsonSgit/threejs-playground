@@ -4,7 +4,7 @@ import knowledge from "../knowledge";
 export default new Trigger({
   name: "conversationStarted",
   events: ["webchat:conversationStarted"] as const,
-  handler: async ({ event: _event }) => {
-    await knowledge.refresh( { force: true } );
+  handler: async () => {
+    await knowledge.refresh();
   },
 });

@@ -1,6 +1,8 @@
 import { Conversation } from "@botpress/runtime";
 import knowledge from "../knowledge";
 
+const intro = new Set<string>();
+
 export default new Conversation({
   channel: "*",
   handler: async (context) => {
@@ -8,7 +10,21 @@ export default new Conversation({
       return;
     }
 
-    await knowledge.refresh({ force: true });
+    if (!intro.has(context.conversation.id)) {
+      intro.add(context.conversation.id);
+      await context.conversation.send({
+        type: "choice",
+        payload: {
+          text: "integrated with knowledge base",
+          options: [
+            { label: "Tell me about ASCII Earth", value: "Tell me about the ASCII Earth demo" },
+            { label: "Explain the Boiling Star", value: "Explain how the Boiling Star effect works" },
+            { label: "How does Particle Network work?", value: "How does the Particle Network demo work?" },
+          ],
+        },
+      });
+    }
+
     await context.execute({
       instructions: `You are a helpful assistant for the Three.js Playground - a collection of interactive WebGL experiments and visual effects.
 
