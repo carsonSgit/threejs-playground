@@ -9,7 +9,7 @@ import knowledge from "../knowledge";
 import { Workflow } from "@botpress/runtime";
 
 export default new Workflow({
-    name: "refresh-knowledge",
+    name: "refreshKnowledge",
     schedule: "0 0 * * *",
     handler: async () => {
         await knowledge.refresh();
