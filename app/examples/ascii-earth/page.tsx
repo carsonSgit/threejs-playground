@@ -5,13 +5,11 @@ import AsciiEarth from "@/components/ascii-earth";
 
 export default function AsciiEarthPage() {
 	useEffect(() => {
-		// Set body styles for this page
 		document.body.style.margin = "0";
 		document.body.style.overflow = "hidden";
 		document.body.style.background = "#000";
 		document.body.style.color = "#fff";
 
-		// Cleanup when leaving the page
 		return () => {
 			document.body.style.margin = "";
 			document.body.style.overflow = "";

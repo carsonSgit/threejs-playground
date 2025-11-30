@@ -1,9 +1,9 @@
 "use client";
 
 /** Inspired by @fernandojsg on GitHub
- * 
+ *
  * https://threejs.org/examples/webgl_buffergeometry_drawrange.html
- * 
+ *
  * Very cool use of buffergeometry drawrange to create a particle network effect!
  */
 
@@ -410,4 +410,3 @@ export default function ParticleNetwork() {
 		</>
 	);
 }
-
