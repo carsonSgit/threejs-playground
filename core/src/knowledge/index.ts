@@ -1,22 +1,34 @@
 import fs from "node:fs";
 import path from "node:path";
+import { fileURLToPath } from "node:url";
 import { DataSource, Knowledge } from "@botpress/runtime";
 
-const docsPathCandidates = [
-  path.resolve(process.cwd(), "src/knowledge/docs"),
-  path.resolve(process.cwd(), "../src/knowledge/docs"),
-  path.resolve(process.cwd(), "../../src/knowledge/docs"),
-  path.resolve(process.cwd(), "./docs")
-];
+const locateDocsDirectory = () => {
+  const moduleDir = path.dirname(fileURLToPath(import.meta.url));
+  const searchBases = [process.cwd(), moduleDir];
+  const relativeTargets = ["src/knowledge/docs", "core/src/knowledge/docs", "docs"];
 
-const docsDirectory =
-  docsPathCandidates.find((candidate) => {
-    try {
-      return fs.existsSync(candidate);
-    } catch {
-      return false;
+  for (const base of searchBases) {
+    let current = base;
+    for (let i = 0; i < 6; i++) {
+      for (const rel of relativeTargets) {
+        const candidate = path.resolve(current, rel);
+        if (fs.existsSync(candidate)) {
+          return candidate;
+        }
+      }
+      const parent = path.dirname(current);
+      if (parent === current) {
+        break;
+      }
+      current = parent;
     }
-  }) ?? docsPathCandidates[0];
+  }
+
+  return path.resolve(process.cwd(), "src/knowledge/docs");
+};
+
+const docsDirectory = locateDocsDirectory();
 
 const FileSource = DataSource.Directory.fromPath(docsDirectory, {
   filter: (filePath) => filePath.endsWith(".md"),
