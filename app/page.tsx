@@ -1,4 +1,5 @@
 import Link from "next/link";
+import Script from "next/script";
 
 export default function Home() {
 	return (
@@ -218,7 +219,7 @@ export default function Home() {
 								<span className="text-white/20">├─</span> three.js_docs →
 							</a>
 							<a
-								href="https://github.com/yourusername/threejs-playground"
+								href="https://github.com/carsonSgit/threejs-playground"
 								target="_blank"
 								rel="noopener noreferrer"
 								className="text-muted-foreground hover:text-foreground transition-colors flex items-center gap-2"
@@ -240,7 +241,17 @@ export default function Home() {
 						</div>
 					</div>
 				</div>
+				<button id="bp-toggle-chat">Toggle chat</button>
 			</footer>
+			{/* Botpress Webchat */}
+			<Script
+				src="https://cdn.botpress.cloud/webchat/v3.4/inject.js"
+				strategy="afterInteractive"
+			/>
+			<Script
+				src="https://files.bpcontent.cloud/2025/11/30/01/20251130014538-Y1MPZGL0.js"
+				strategy="afterInteractive"
+			/>
 		</>
 	);
 }
