@@ -75,29 +75,42 @@ function SidebarInner() {
     <SidebarContent>
       <SidebarGroup>
         <SidebarMenu className="gap-0">
-          {/* Back to Examples - only shown on example pages */}
+          {/* Back to Examples - only shown on example pages, with X button */}
           {isExamplePage && (
             <SidebarMenuItem>
-              <SidebarMenuButton
-                asChild
-                tooltip="Back to Examples"
-                className="font-mono text-xs rounded-none border-0 hover:bg-sidebar-accent/30"
-              >
-                <Link href="/">
-                  <ArrowLeft className="h-4 w-4 shrink-0" />
-                  <span>back_to_examples</span>
-                </Link>
-              </SidebarMenuButton>
+              <div className="flex items-center">
+                <SidebarMenuButton
+                  asChild
+                  tooltip="Back to Examples"
+                  className="font-mono text-xs rounded-none border-0 hover:bg-sidebar-accent/30 flex-1"
+                >
+                  <Link href="/">
+                    <ArrowLeft className="h-4 w-4 shrink-0" />
+                    <span>back_to_examples</span>
+                  </Link>
+                </SidebarMenuButton>
+                
+                {/* Close button - only visible when expanded */}
+                <Button
+                  variant="ghost"
+                  size="icon"
+                  onClick={toggleSidebar}
+                  className="h-8 w-8 shrink-0 rounded-none hover:bg-sidebar-accent/30 group-data-[collapsible=icon]:hidden"
+                >
+                  <X className="h-4 w-4" />
+                  <span className="sr-only">Close Sidebar</span>
+                </Button>
+              </div>
             </SidebarMenuItem>
           )}
           
           <SidebarMenuItem>
-            {/* Row container for bot button + close button */}
+            {/* Row container for bot button */}
             <div className="flex items-center">
               <SidebarMenuButton
                 onClick={handleBotClick}
                 tooltip={state === "collapsed" ? "Open Sidebar" : "Toggle Assistant"}
-                className="font-mono text-xs rounded-none border-0 hover:bg-sidebar-accent/30 flex-1 justify-between"
+                className="font-mono text-xs rounded-none border-0 hover:bg-sidebar-accent/30 flex-1 justify-between pr-0"
               >
                 <div className="flex items-center gap-2">
                   <Bot className="h-4 w-4 shrink-0" />
@@ -112,16 +125,18 @@ function SidebarInner() {
                 </div>
               </SidebarMenuButton>
               
-              {/* Close button - only visible when expanded */}
-              <Button
-                variant="ghost"
-                size="icon"
-                onClick={toggleSidebar}
-                className="h-8 w-8 shrink-0 rounded-none hover:bg-sidebar-accent/30 group-data-[collapsible=icon]:hidden"
-              >
-                <X className="h-4 w-4" />
-                <span className="sr-only">Close Sidebar</span>
-              </Button>
+              {/* X button - only on home page */}
+              {!isExamplePage && (
+                <Button
+                  variant="ghost"
+                  size="icon"
+                  onClick={toggleSidebar}
+                  className="h-8 w-8 shrink-0 rounded-none hover:bg-sidebar-accent/30 group-data-[collapsible=icon]:hidden"
+                >
+                  <X className="h-4 w-4" />
+                  <span className="sr-only">Close Sidebar</span>
+                </Button>
+              )}
             </div>
             
             {/* Accordion content - hidden when collapsed */}
