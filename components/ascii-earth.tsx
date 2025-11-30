@@ -69,9 +69,9 @@ export default function AsciiEarth() {
 				data[i + 2] *= 0.5; // B
 			}
 
-		ctx.putImageData(imgData, 0, 0);
-		earthTexture.image = canvas as any;
-		earthTexture.needsUpdate = true;
+			ctx.putImageData(imgData, 0, 0);
+			earthTexture.image = canvas as any;
+			earthTexture.needsUpdate = true;
 		};
 
 		// Create Earth sphere

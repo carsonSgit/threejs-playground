@@ -16,9 +16,7 @@ export default function RootLayout({
 	return (
 		<html lang="en" className="dark">
 			<body>
-				<SidebarWrapper>
-					{children}
-				</SidebarWrapper>
+				<SidebarWrapper>{children}</SidebarWrapper>
 				{/* Botpress Webchat Scripts */}
 				<Script
 					src="https://cdn.botpress.cloud/webchat/v3.4/inject.js"

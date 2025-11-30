@@ -388,7 +388,7 @@ export default function BoilingStar() {
 		);
 		camera.position.set(0, 0, 6);
 
-		const renderer = new THREE.WebGLRenderer({ 
+		const renderer = new THREE.WebGLRenderer({
 			antialias: true,
 			powerPreference: "high-performance",
 			stencil: false,
@@ -436,7 +436,7 @@ export default function BoilingStar() {
 		const numFlareStreams = 30;
 		const particlesPerStream = 20;
 		const totalParticles = numFlareStreams * particlesPerStream;
-		
+
 		const flareGeometry = new THREE.BufferGeometry();
 		const positions = new Float32Array(totalParticles * 3);
 		const lifePhases = new Float32Array(totalParticles);
@@ -444,55 +444,72 @@ export default function BoilingStar() {
 		const directions = new Float32Array(totalParticles * 3);
 		const speeds = new Float32Array(totalParticles);
 		const flareGroups = new Float32Array(totalParticles);
-		
+
 		let idx = 0;
 		for (let stream = 0; stream < numFlareStreams; stream++) {
 			const phi = Math.acos(2 * Math.random() - 1);
 			const theta = Math.random() * Math.PI * 2;
 			const radius = 1.0;
-			
+
 			const sourceX = radius * Math.sin(phi) * Math.cos(theta);
 			const sourceY = radius * Math.sin(phi) * Math.sin(theta);
 			const sourceZ = radius * Math.cos(phi);
-			
-			const dirLen = Math.sqrt(sourceX * sourceX + sourceY * sourceY + sourceZ * sourceZ);
+
+			const dirLen = Math.sqrt(
+				sourceX * sourceX + sourceY * sourceY + sourceZ * sourceZ,
+			);
 			const dirX = sourceX / dirLen;
 			const dirY = sourceY / dirLen;
 			const dirZ = sourceZ / dirLen;
-			
+
 			for (let p = 0; p < particlesPerStream; p++) {
 				const i = idx * 3;
-				
+
 				positions[i] = sourceX;
 				positions[i + 1] = sourceY;
 				positions[i + 2] = sourceZ;
-				
+
 				lifePhases[idx] = p / particlesPerStream;
-				
+
 				sourcePosArray[i] = sourceX;
 				sourcePosArray[i + 1] = sourceY;
 				sourcePosArray[i + 2] = sourceZ;
-				
+
 				const spread = 0.3;
 				directions[i] = dirX + (Math.random() - 1) * spread;
 				directions[i + 1] = dirY + (Math.random() - 0.1) * spread;
 				directions[i + 2] = dirZ + (Math.random() - 0.1) * spread;
-				
+
 				speeds[idx] = 0.8 + Math.random() * 0.4;
-				
+
 				flareGroups[idx] = stream;
-				
+
 				idx++;
 			}
 		}
-		
-		flareGeometry.setAttribute('position', new THREE.BufferAttribute(positions, 3));
-		flareGeometry.setAttribute('aLifePhase', new THREE.BufferAttribute(lifePhases, 1));
-		flareGeometry.setAttribute('aSourcePos', new THREE.BufferAttribute(sourcePosArray, 3));
-		flareGeometry.setAttribute('aDirection', new THREE.BufferAttribute(directions, 3));
-		flareGeometry.setAttribute('aSpeed', new THREE.BufferAttribute(speeds, 1));
-		flareGeometry.setAttribute('aFlareGroup', new THREE.BufferAttribute(flareGroups, 1));
-		
+
+		flareGeometry.setAttribute(
+			"position",
+			new THREE.BufferAttribute(positions, 3),
+		);
+		flareGeometry.setAttribute(
+			"aLifePhase",
+			new THREE.BufferAttribute(lifePhases, 1),
+		);
+		flareGeometry.setAttribute(
+			"aSourcePos",
+			new THREE.BufferAttribute(sourcePosArray, 3),
+		);
+		flareGeometry.setAttribute(
+			"aDirection",
+			new THREE.BufferAttribute(directions, 3),
+		);
+		flareGeometry.setAttribute("aSpeed", new THREE.BufferAttribute(speeds, 1));
+		flareGeometry.setAttribute(
+			"aFlareGroup",
+			new THREE.BufferAttribute(flareGroups, 1),
+		);
+
 		const flareMaterial = new THREE.ShaderMaterial({
 			vertexShader: particleFlareVertexShader,
 			fragmentShader: particleFlareFragmentShader,
@@ -504,9 +521,9 @@ export default function BoilingStar() {
 			blending: THREE.AdditiveBlending,
 			depthWrite: false,
 		});
-		
+
 		const flareParticles = new THREE.Points(flareGeometry, flareMaterial);
-		flareParticles.frustumCulled = false; 
+		flareParticles.frustumCulled = false;
 		scene.add(flareParticles);
 
 		const composer = new EffectComposer(renderer);
@@ -514,7 +531,7 @@ export default function BoilingStar() {
 
 		const bloomResolution = new THREE.Vector2(
 			window.innerWidth * 0.8,
-			window.innerHeight * 0.8
+			window.innerHeight * 0.8,
 		);
 		const bloomPass = new UnrealBloomPass(
 			bloomResolution,
@@ -524,23 +541,23 @@ export default function BoilingStar() {
 		);
 		composer.addPass(bloomPass);
 
-	let time = 0;
-	function animate() {
-		time += 0.016; // 60fps delta
+		let time = 0;
+		function animate() {
+			time += 0.016; // 60fps delta
 
-		starMaterial.uniforms.uTime.value = time;
-		coronaMaterial.uniforms.uTime.value = time;
-		flareMaterial.uniforms.uTime.value = time;
+			starMaterial.uniforms.uTime.value = time;
+			coronaMaterial.uniforms.uTime.value = time;
+			flareMaterial.uniforms.uTime.value = time;
 
-		star.rotation.y += 0.001;
-		corona.rotation.y -= 0.0008;
-		corona.rotation.x += 0.0005;
+			star.rotation.y += 0.001;
+			corona.rotation.y -= 0.0008;
+			corona.rotation.x += 0.0005;
 
-		controls.update();
-		composer.render();
-	}
+			controls.update();
+			composer.render();
+		}
 
-	renderer.setAnimationLoop(animate);
+		renderer.setAnimationLoop(animate);
 
 		const handleResize = () => {
 			const w = window.innerWidth;
@@ -551,30 +568,29 @@ export default function BoilingStar() {
 
 			renderer.setSize(w, h);
 			composer.setSize(w, h);
-			
+
 			bloomPass.resolution.set(w * 0.8, h * 0.8);
 		};
 
 		window.addEventListener("resize", handleResize);
 
-	return () => {
-		window.removeEventListener("resize", handleResize);
-		renderer.setAnimationLoop(null);
-		controls.dispose();
-		starGeometry.dispose();
-		starMaterial.dispose();
-		coronaGeometry.dispose();
-		coronaMaterial.dispose();
-		flareGeometry.dispose();
-		flareMaterial.dispose();
-		renderer.dispose();
+		return () => {
+			window.removeEventListener("resize", handleResize);
+			renderer.setAnimationLoop(null);
+			controls.dispose();
+			starGeometry.dispose();
+			starMaterial.dispose();
+			coronaGeometry.dispose();
+			coronaMaterial.dispose();
+			flareGeometry.dispose();
+			flareMaterial.dispose();
+			renderer.dispose();
 
-		if (containerRef.current) {
-			containerRef.current.innerHTML = "";
-		}
-	};
+			if (containerRef.current) {
+				containerRef.current.innerHTML = "";
+			}
+		};
 	}, []);
 
 	return <div ref={containerRef} className="w-full h-full" />;
 }
-
