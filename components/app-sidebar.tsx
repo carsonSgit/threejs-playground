@@ -185,9 +185,11 @@ function SidebarInner() {
 	);
 }
 
-export function AppSidebar() {
+export function AppSidebar({
+	collapsible = "icon",
+}: { collapsible?: "icon" | "offcanvas" | "none" }) {
 	return (
-		<Sidebar side="left" variant="sidebar" collapsible="icon">
+		<Sidebar side="left" variant="sidebar" collapsible={collapsible}>
 			<SidebarInner />
 		</Sidebar>
 	);
