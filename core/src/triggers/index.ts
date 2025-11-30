@@ -1,8 +1,10 @@
-/**
- * TODO: Add your triggers here
- *
- * This is a placeholder file to initialize the triggers directory.
- * You can delete this file once you add your own triggers.
- */
+import { Trigger } from "@botpress/runtime";
+import knowledge from "../knowledge";
 
-export default {};
+export default new Trigger({
+  name: "conversationStarted",
+  events: ["webchat:conversationStarted"] as const,
+  handler: async ({ event: _event }) => {
+    await knowledge.refresh( { force: true } );
+  },
+});
