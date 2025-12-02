@@ -1,16 +1,12 @@
 "use client";
 
-import { useState } from "react";
-import { Send, AlertCircle, RotateCcw } from "lucide-react";
+import { AlertCircle, RotateCcw } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 
 export function MockWebchat() {
-	const [message, setMessage] = useState("");
-
 	return (
-		<div className="border-t border-white/10 bg-[#101010] flex flex-col h-[550px]" style={{ fontFamily: 'IBM Plex Mono, monospace' }}>
-			{/* Header */}
+		<div className="border-t border-white/10 bg-[#101010] flex flex-col h-[550px] font-mono">
 			<div className="flex items-center gap-3 p-4 border-b border-white/10 cursor-default">
 				<div className="w-10 h-10 rounded-full bg-white/10 flex items-center justify-center shrink-0">
 					<span className="text-sm font-medium text-white">c</span>
@@ -50,12 +46,9 @@ export function MockWebchat() {
 			<div className="border-t border-white/10 p-4 space-y-2 bg-[#101010]">
 				<div className="flex gap-2">
 					<Input
-						value={message}
-						onChange={(e) => setMessage(e.target.value)}
 						placeholder="what kind of math do these use?"
 						disabled
-						className="flex-1 h-10 bg-[#202020] border-[#2f2f2f] text-[#525355] placeholder:text-[#F0F0F0] text-sm rounded-sm disabled:cursor-not-allowed"
-						style={{ fontFamily: 'IBM Plex Mono, monospace' }}
+						className="flex-1 h-10 bg-[#202020] border-[#2f2f2f] text-[#525355] placeholder:text-[#F0F0F0] text-sm rounded-sm disabled:cursor-not-allowed font-mono"
 					/>
 				</div>
 				<div className="text-center">

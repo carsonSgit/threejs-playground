@@ -24,7 +24,7 @@ declare global {
 			toggle: () => void;
 		};
 		botpress?: {
-			on: (event: string, handler: (data: any) => void) => () => void;
+			on: (event: string, handler: (data: unknown) => void) => () => void;
 			open: () => void;
 			close: () => void;
 			toggle: () => void;
@@ -32,7 +32,11 @@ declare global {
 	}
 }
 
-function SidebarInner() {
+function SidebarInner({
+	onWebchatStateChange,
+}: {
+	onWebchatStateChange: (visible: boolean, hasError: boolean) => void;
+}) {
 	const [chatVisible, setChatVisible] = useState(false);
 	const [botpressStatus, setBotpressStatus] = useState<
 		"loading" | "ready" | "error"
@@ -43,39 +47,31 @@ function SidebarInner() {
 	const isExamplePage = pathname.startsWith("/examples");
 
 	useEffect(() => {
+		onWebchatStateChange(chatVisible, hasQuotaError);
+	}, [chatVisible, hasQuotaError, onWebchatStateChange]);
+
+	useEffect(() => {
 		let unsubscribeError: (() => void) | null = null;
-		let unsubscribeInit: (() => void) | null = null;
 		let unsubscribeReady: (() => void) | null = null;
 		let timeoutId: NodeJS.Timeout;
 
 		const setupListeners = () => {
 			if (window.botpress) {
-				// Listen for errors (like quota limits)
-				unsubscribeError = window.botpress.on('error', (error) => {
-					console.warn('Botpress error detected, falling back to mock');
+				unsubscribeError = window.botpress.on('error', () => {
 					setBotpressStatus("error");
 					setHasQuotaError(true);
 				});
 
-				// Listen for successful initialization
-				unsubscribeInit = window.botpress.on('webchat:initialized', () => {
-					console.log('Botpress initialized successfully');
-				});
-
-				// Listen for ready state (means it's working)
 				unsubscribeReady = window.botpress.on('webchat:ready', () => {
-					console.log('Botpress ready - no quota errors');
 					setBotpressStatus("ready");
 					setHasQuotaError(false);
 				});
 			}
 		};
 
-		// Check if botpress is already loaded
 		if (window.botpress) {
 			setupListeners();
 		} else {
-			// Wait for botpress to load
 			const checkInterval = setInterval(() => {
 				if (window.botpress) {
 					setupListeners();
@@ -83,11 +79,9 @@ function SidebarInner() {
 				}
 			}, 100);
 
-			// Timeout after 5 seconds - assume error
 			timeoutId = setTimeout(() => {
 				clearInterval(checkInterval);
 				if (botpressStatus === "loading") {
-					console.warn('Botpress load timeout, using mock');
 					setBotpressStatus("error");
 					setHasQuotaError(true);
 				}
@@ -96,7 +90,6 @@ function SidebarInner() {
 
 		return () => {
 			if (unsubscribeError) unsubscribeError();
-			if (unsubscribeInit) unsubscribeInit();
 			if (unsubscribeReady) unsubscribeReady();
 			if (timeoutId) clearTimeout(timeoutId);
 		};
@@ -104,35 +97,32 @@ function SidebarInner() {
 
 	const toggleChat = () => {
 		if (window.botpress && !hasQuotaError) {
-			// Use real Botpress
 			if (chatVisible) {
 				window.botpress.close();
 			} else {
 				window.botpress.open();
 			}
 		}
-		// Toggle mock visibility
 		setChatVisible(!chatVisible);
 	};
 
-	// Inject CSS to hide Botpress UI when there's a quota error
 	useEffect(() => {
 		const styleId = 'botpress-hide-style';
-		let style = document.getElementById(styleId) as HTMLStyleElement;
+		const style = document.getElementById(styleId);
 
 		if (hasQuotaError) {
-			if (!style) {
-				style = document.createElement('style');
-				style.id = styleId;
-				document.head.appendChild(style);
+			let styleEl = style;
+			if (!styleEl) {
+				styleEl = document.createElement('style');
+				styleEl.id = styleId;
+				document.head.appendChild(styleEl);
 			}
-			style.textContent = `
+			styleEl.textContent = `
 				#bp-web-widget { display: none !important; }
 				.bpFab { display: none !important; }
 				.bpWidget { display: none !important; }
 			`;
 		} else {
-			// Remove the style if no quota error
 			if (style) {
 				style.remove();
 			}
@@ -153,12 +143,8 @@ function SidebarInner() {
 	};
 
 	return (
-		<SidebarContent 
-			className={`border-r border-sidebar-border bg-sidebar overflow-hidden transition-all duration-500 ease-in-out ${
-				chatVisible && hasQuotaError ? "min-w-[350px]" : ""
-			}`}
-		>
-			<SidebarGroup className="px-0 py-0">
+		<SidebarContent>
+			<SidebarGroup>
 				<SidebarMenu className="gap-0">
 					{isExamplePage && (
 						<SidebarMenuItem>
@@ -223,8 +209,12 @@ function SidebarInner() {
 						</div>
 
 						<div
-							className={`overflow-hidden transition-all duration-500 ease-in-out group-data-[collapsible=icon]:hidden ${
-								chatVisible ? "max-h-[600px] opacity-100" : "max-h-0 opacity-0"
+							className={`overflow-hidden transition-all duration-300 ease-in-out group-data-[collapsible=icon]:hidden ${
+								chatVisible
+									? hasQuotaError
+										? "max-h-[550px] opacity-100"
+										: "max-h-96 opacity-100"
+									: "max-h-0 opacity-0"
 							}`}
 						>
 							{botpressStatus === "loading" && (
@@ -258,9 +248,30 @@ function SidebarInner() {
 export function AppSidebar({
 	collapsible = "icon",
 }: { collapsible?: "icon" | "offcanvas" | "none" }) {
+	const [webchatVisible, setWebchatVisible] = useState(false);
+	const [hasQuotaError, setHasQuotaError] = useState(false);
+
+	const handleWebchatStateChange = (visible: boolean, hasError: boolean) => {
+		setWebchatVisible(visible);
+		setHasQuotaError(hasError);
+	};
+
+	const shouldWiden = webchatVisible && hasQuotaError;
+
 	return (
-		<Sidebar side="left" variant="sidebar" collapsible={collapsible}>
-			<SidebarInner />
+		<Sidebar
+			side="left"
+			variant="sidebar"
+			collapsible={collapsible}
+			style={
+				shouldWiden
+					? {
+							"--sidebar-width": "350px",
+						} as React.CSSProperties
+					: undefined
+			}
+		>
+			<SidebarInner onWebchatStateChange={handleWebchatStateChange} />
 		</Sidebar>
 	);
 }
