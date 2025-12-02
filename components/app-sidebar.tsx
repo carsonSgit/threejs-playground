@@ -57,12 +57,12 @@ function SidebarInner({
 
 		const setupListeners = () => {
 			if (window.botpress) {
-				unsubscribeError = window.botpress.on('error', () => {
+				unsubscribeError = window.botpress.on("error", () => {
 					setBotpressStatus("error");
 					setHasQuotaError(true);
 				});
 
-				unsubscribeReady = window.botpress.on('webchat:ready', () => {
+				unsubscribeReady = window.botpress.on("webchat:ready", () => {
 					setBotpressStatus("ready");
 					setHasQuotaError(false);
 				});
@@ -107,13 +107,13 @@ function SidebarInner({
 	};
 
 	useEffect(() => {
-		const styleId = 'botpress-hide-style';
+		const styleId = "botpress-hide-style";
 		const style = document.getElementById(styleId);
 
 		if (hasQuotaError) {
 			let styleEl = style;
 			if (!styleEl) {
-				styleEl = document.createElement('style');
+				styleEl = document.createElement("style");
 				styleEl.id = styleId;
 				document.head.appendChild(styleEl);
 			}
@@ -247,7 +247,9 @@ function SidebarInner({
 
 export function AppSidebar({
 	collapsible = "icon",
-}: { collapsible?: "icon" | "offcanvas" | "none" }) {
+}: {
+	collapsible?: "icon" | "offcanvas" | "none";
+}) {
 	const [webchatVisible, setWebchatVisible] = useState(false);
 	const [hasQuotaError, setHasQuotaError] = useState(false);
 
@@ -265,9 +267,9 @@ export function AppSidebar({
 			collapsible={collapsible}
 			style={
 				shouldWiden
-					? {
+					? ({
 							"--sidebar-width": "350px",
-						} as React.CSSProperties
+						} as React.CSSProperties)
 					: undefined
 			}
 		>
