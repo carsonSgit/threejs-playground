@@ -26,6 +26,7 @@ export default function RootLayout({
 					src="https://files.bpcontent.cloud/2025/11/30/01/20251130014538-Y1MPZGL0.js"
 					strategy="afterInteractive"
 				/>
+				{/* Let Botpress show naturally, only hide if quota error detected by event listener */}
 			</body>
 		</html>
 	);

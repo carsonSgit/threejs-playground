@@ -4,6 +4,7 @@ import { useState, useEffect } from "react";
 import { usePathname } from "next/navigation";
 import Link from "next/link";
 import { ChevronDown, Bot, AlertCircle, X, ArrowLeft } from "lucide-react";
+import { MockWebchat } from "@/components/mock-webchat";
 import {
 	Sidebar,
 	SidebarContent,
@@ -22,48 +23,126 @@ declare global {
 			close: () => void;
 			toggle: () => void;
 		};
+		botpress?: {
+			on: (event: string, handler: (data: any) => void) => () => void;
+			open: () => void;
+			close: () => void;
+			toggle: () => void;
+		};
 	}
 }
 
 function SidebarInner() {
-	const [chatVisible, setChatVisible] = useState(true);
+	const [chatVisible, setChatVisible] = useState(false);
 	const [botpressStatus, setBotpressStatus] = useState<
 		"loading" | "ready" | "error"
 	>("loading");
+	const [hasQuotaError, setHasQuotaError] = useState(false);
 	const { state, toggleSidebar } = useSidebar();
 	const pathname = usePathname();
 	const isExamplePage = pathname.startsWith("/examples");
 
 	useEffect(() => {
-		let attempts = 0;
-		const maxAttempts = 30; // 6 seconds total
+		let unsubscribeError: (() => void) | null = null;
+		let unsubscribeInit: (() => void) | null = null;
+		let unsubscribeReady: (() => void) | null = null;
+		let timeoutId: NodeJS.Timeout;
 
-		const checkBotpress = setInterval(() => {
-			attempts++;
+		const setupListeners = () => {
+			if (window.botpress) {
+				// Listen for errors (like quota limits)
+				unsubscribeError = window.botpress.on('error', (error) => {
+					console.warn('Botpress error detected, falling back to mock');
+					setBotpressStatus("error");
+					setHasQuotaError(true);
+				});
 
-			if (window.botpressWebChat) {
-				setBotpressStatus("ready");
-				window.botpressWebChat.open();
-				clearInterval(checkBotpress);
-			} else if (attempts >= maxAttempts) {
-				setBotpressStatus("error");
-				clearInterval(checkBotpress);
+				// Listen for successful initialization
+				unsubscribeInit = window.botpress.on('webchat:initialized', () => {
+					console.log('Botpress initialized successfully');
+				});
+
+				// Listen for ready state (means it's working)
+				unsubscribeReady = window.botpress.on('webchat:ready', () => {
+					console.log('Botpress ready - no quota errors');
+					setBotpressStatus("ready");
+					setHasQuotaError(false);
+				});
 			}
-		}, 200);
+		};
 
-		return () => clearInterval(checkBotpress);
-	}, []);
+		// Check if botpress is already loaded
+		if (window.botpress) {
+			setupListeners();
+		} else {
+			// Wait for botpress to load
+			const checkInterval = setInterval(() => {
+				if (window.botpress) {
+					setupListeners();
+					clearInterval(checkInterval);
+				}
+			}, 100);
+
+			// Timeout after 5 seconds - assume error
+			timeoutId = setTimeout(() => {
+				clearInterval(checkInterval);
+				if (botpressStatus === "loading") {
+					console.warn('Botpress load timeout, using mock');
+					setBotpressStatus("error");
+					setHasQuotaError(true);
+				}
+			}, 5000);
+		}
+
+		return () => {
+			if (unsubscribeError) unsubscribeError();
+			if (unsubscribeInit) unsubscribeInit();
+			if (unsubscribeReady) unsubscribeReady();
+			if (timeoutId) clearTimeout(timeoutId);
+		};
+	}, [botpressStatus]);
 
 	const toggleChat = () => {
-		if (window.botpressWebChat) {
+		if (window.botpress && !hasQuotaError) {
+			// Use real Botpress
 			if (chatVisible) {
-				window.botpressWebChat.close();
+				window.botpress.close();
 			} else {
-				window.botpressWebChat.open();
+				window.botpress.open();
 			}
 		}
+		// Toggle mock visibility
 		setChatVisible(!chatVisible);
 	};
+
+	// Inject CSS to hide Botpress UI when there's a quota error
+	useEffect(() => {
+		const styleId = 'botpress-hide-style';
+		let style = document.getElementById(styleId) as HTMLStyleElement;
+
+		if (hasQuotaError) {
+			if (!style) {
+				style = document.createElement('style');
+				style.id = styleId;
+				document.head.appendChild(style);
+			}
+			style.textContent = `
+				#bp-web-widget { display: none !important; }
+				.bpFab { display: none !important; }
+				.bpWidget { display: none !important; }
+			`;
+		} else {
+			// Remove the style if no quota error
+			if (style) {
+				style.remove();
+			}
+		}
+
+		return () => {
+			const cleanupStyle = document.getElementById(styleId);
+			if (cleanupStyle) cleanupStyle.remove();
+		};
+	}, [hasQuotaError]);
 
 	const handleBotClick = () => {
 		if (state === "collapsed") {
@@ -74,8 +153,12 @@ function SidebarInner() {
 	};
 
 	return (
-		<SidebarContent>
-			<SidebarGroup>
+		<SidebarContent 
+			className={`border-r border-sidebar-border bg-sidebar overflow-hidden transition-all duration-500 ease-in-out ${
+				chatVisible && hasQuotaError ? "min-w-[350px]" : ""
+			}`}
+		>
+			<SidebarGroup className="px-0 py-0">
 				<SidebarMenu className="gap-0">
 					{isExamplePage && (
 						<SidebarMenuItem>
@@ -140,8 +223,8 @@ function SidebarInner() {
 						</div>
 
 						<div
-							className={`overflow-hidden transition-all duration-300 ease-in-out group-data-[collapsible=icon]:hidden ${
-								chatVisible ? "max-h-96 opacity-100" : "max-h-0 opacity-0"
+							className={`overflow-hidden transition-all duration-500 ease-in-out group-data-[collapsible=icon]:hidden ${
+								chatVisible ? "max-h-[600px] opacity-100" : "max-h-0 opacity-0"
 							}`}
 						>
 							{botpressStatus === "loading" && (
@@ -152,22 +235,9 @@ function SidebarInner() {
 								</div>
 							)}
 
-							{botpressStatus === "error" && (
-								<div className="border-t border-red-400/20 bg-red-400/5 px-2 py-2">
-									<div className="flex items-center gap-2 text-red-400">
-										<AlertCircle className="h-3 w-3 shrink-0" />
-										<span className="text-xs font-mono font-medium">
-											webchat unavailable
-										</span>
-									</div>
-									<div className="mt-1 text-[10px] text-muted-foreground font-mono">
-										the assistant may have reached its usage limit. please try
-										again later.
-									</div>
-								</div>
-							)}
+							{botpressStatus === "error" && hasQuotaError && <MockWebchat />}
 
-							{botpressStatus === "ready" && (
+							{botpressStatus === "ready" && !hasQuotaError && (
 								<div className="border-t border-sidebar-border bg-sidebar-accent/30 px-2 py-2">
 									<div className="text-xs text-muted-foreground font-mono">
 										<span className="text-green-400">●</span> webchat active
