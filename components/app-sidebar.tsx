@@ -4,6 +4,7 @@ import { useState, useEffect } from "react";
 import { usePathname } from "next/navigation";
 import Link from "next/link";
 import { ChevronDown, Bot, AlertCircle, X, ArrowLeft } from "lucide-react";
+import { MockWebchat } from "@/components/mock-webchat";
 import {
 	Sidebar,
 	SidebarContent,
@@ -22,48 +23,116 @@ declare global {
 			close: () => void;
 			toggle: () => void;
 		};
+		botpress?: {
+			on: (event: string, handler: (data: unknown) => void) => () => void;
+			open: () => void;
+			close: () => void;
+			toggle: () => void;
+		};
 	}
 }
 
-function SidebarInner() {
-	const [chatVisible, setChatVisible] = useState(true);
+function SidebarInner({
+	onWebchatStateChange,
+}: {
+	onWebchatStateChange: (visible: boolean, hasError: boolean) => void;
+}) {
+	const [chatVisible, setChatVisible] = useState(false);
 	const [botpressStatus, setBotpressStatus] = useState<
 		"loading" | "ready" | "error"
 	>("loading");
+	const [hasQuotaError, setHasQuotaError] = useState(false);
 	const { state, toggleSidebar } = useSidebar();
 	const pathname = usePathname();
 	const isExamplePage = pathname.startsWith("/examples");
 
 	useEffect(() => {
-		let attempts = 0;
-		const maxAttempts = 30; // 6 seconds total
+		onWebchatStateChange(chatVisible, hasQuotaError);
+	}, [chatVisible, hasQuotaError, onWebchatStateChange]);
 
-		const checkBotpress = setInterval(() => {
-			attempts++;
+	useEffect(() => {
+		let unsubscribeError: (() => void) | null = null;
+		let unsubscribeReady: (() => void) | null = null;
+		let timeoutId: NodeJS.Timeout;
 
-			if (window.botpressWebChat) {
-				setBotpressStatus("ready");
-				window.botpressWebChat.open();
-				clearInterval(checkBotpress);
-			} else if (attempts >= maxAttempts) {
-				setBotpressStatus("error");
-				clearInterval(checkBotpress);
+		const setupListeners = () => {
+			if (window.botpress) {
+				unsubscribeError = window.botpress.on("error", () => {
+					setBotpressStatus("error");
+					setHasQuotaError(true);
+				});
+
+				unsubscribeReady = window.botpress.on("webchat:ready", () => {
+					setBotpressStatus("ready");
+					setHasQuotaError(false);
+				});
 			}
-		}, 200);
+		};
 
-		return () => clearInterval(checkBotpress);
-	}, []);
+		if (window.botpress) {
+			setupListeners();
+		} else {
+			const checkInterval = setInterval(() => {
+				if (window.botpress) {
+					setupListeners();
+					clearInterval(checkInterval);
+				}
+			}, 100);
+
+			timeoutId = setTimeout(() => {
+				clearInterval(checkInterval);
+				if (botpressStatus === "loading") {
+					setBotpressStatus("error");
+					setHasQuotaError(true);
+				}
+			}, 5000);
+		}
+
+		return () => {
+			if (unsubscribeError) unsubscribeError();
+			if (unsubscribeReady) unsubscribeReady();
+			if (timeoutId) clearTimeout(timeoutId);
+		};
+	}, [botpressStatus]);
 
 	const toggleChat = () => {
-		if (window.botpressWebChat) {
+		if (window.botpress && !hasQuotaError) {
 			if (chatVisible) {
-				window.botpressWebChat.close();
+				window.botpress.close();
 			} else {
-				window.botpressWebChat.open();
+				window.botpress.open();
 			}
 		}
 		setChatVisible(!chatVisible);
 	};
+
+	useEffect(() => {
+		const styleId = "botpress-hide-style";
+		const style = document.getElementById(styleId);
+
+		if (hasQuotaError) {
+			let styleEl = style;
+			if (!styleEl) {
+				styleEl = document.createElement("style");
+				styleEl.id = styleId;
+				document.head.appendChild(styleEl);
+			}
+			styleEl.textContent = `
+				#bp-web-widget { display: none !important; }
+				.bpFab { display: none !important; }
+				.bpWidget { display: none !important; }
+			`;
+		} else {
+			if (style) {
+				style.remove();
+			}
+		}
+
+		return () => {
+			const cleanupStyle = document.getElementById(styleId);
+			if (cleanupStyle) cleanupStyle.remove();
+		};
+	}, [hasQuotaError]);
 
 	const handleBotClick = () => {
 		if (state === "collapsed") {
@@ -141,7 +210,11 @@ function SidebarInner() {
 
 						<div
 							className={`overflow-hidden transition-all duration-300 ease-in-out group-data-[collapsible=icon]:hidden ${
-								chatVisible ? "max-h-96 opacity-100" : "max-h-0 opacity-0"
+								chatVisible
+									? hasQuotaError
+										? "max-h-[550px] opacity-100"
+										: "max-h-96 opacity-100"
+									: "max-h-0 opacity-0"
 							}`}
 						>
 							{botpressStatus === "loading" && (
@@ -152,22 +225,9 @@ function SidebarInner() {
 								</div>
 							)}
 
-							{botpressStatus === "error" && (
-								<div className="border-t border-red-400/20 bg-red-400/5 px-2 py-2">
-									<div className="flex items-center gap-2 text-red-400">
-										<AlertCircle className="h-3 w-3 shrink-0" />
-										<span className="text-xs font-mono font-medium">
-											webchat unavailable
-										</span>
-									</div>
-									<div className="mt-1 text-[10px] text-muted-foreground font-mono">
-										the assistant may have reached its usage limit. please try
-										again later.
-									</div>
-								</div>
-							)}
+							{botpressStatus === "error" && hasQuotaError && <MockWebchat />}
 
-							{botpressStatus === "ready" && (
+							{botpressStatus === "ready" && !hasQuotaError && (
 								<div className="border-t border-sidebar-border bg-sidebar-accent/30 px-2 py-2">
 									<div className="text-xs text-muted-foreground font-mono">
 										<span className="text-green-400">●</span> webchat active
@@ -187,10 +247,33 @@ function SidebarInner() {
 
 export function AppSidebar({
 	collapsible = "icon",
-}: { collapsible?: "icon" | "offcanvas" | "none" }) {
+}: {
+	collapsible?: "icon" | "offcanvas" | "none";
+}) {
+	const [webchatVisible, setWebchatVisible] = useState(false);
+	const [hasQuotaError, setHasQuotaError] = useState(false);
+
+	const handleWebchatStateChange = (visible: boolean, hasError: boolean) => {
+		setWebchatVisible(visible);
+		setHasQuotaError(hasError);
+	};
+
+	const shouldWiden = webchatVisible && hasQuotaError;
+
 	return (
-		<Sidebar side="left" variant="sidebar" collapsible={collapsible}>
-			<SidebarInner />
+		<Sidebar
+			side="left"
+			variant="sidebar"
+			collapsible={collapsible}
+			style={
+				shouldWiden
+					? ({
+							"--sidebar-width": "350px",
+						} as React.CSSProperties)
+					: undefined
+			}
+		>
+			<SidebarInner onWebchatStateChange={handleWebchatStateChange} />
 		</Sidebar>
 	);
 }
