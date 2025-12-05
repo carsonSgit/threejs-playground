@@ -4,7 +4,12 @@ import { AlertCircle, RotateCcw } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 
-export function MockWebchat() {
+interface MockWebchatProps {
+	onRetry?: () => void;
+	isRetrying?: boolean;
+}
+
+export function MockWebchat({ onRetry, isRetrying }: MockWebchatProps) {
 	return (
 		<div className="border-t border-white/10 bg-[#101010] flex flex-col h-[550px] font-mono">
 			<div className="flex items-center gap-3 p-4 border-b border-white/10 cursor-default">
@@ -20,10 +25,13 @@ export function MockWebchat() {
 				<Button
 					variant="ghost"
 					size="icon"
-					disabled
+					onClick={onRetry}
+					disabled={isRetrying}
 					className="h-8 w-8 shrink-0 text-gray-400 hover:text-white hover:bg-white/10 disabled:opacity-50"
 				>
-					<RotateCcw className="h-4 w-4" />
+					<RotateCcw
+						className={`h-4 w-4 ${isRetrying ? "animate-spin" : ""}`}
+					/>
 				</Button>
 			</div>
 
