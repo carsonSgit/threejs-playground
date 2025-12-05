@@ -22,6 +22,7 @@ import {
 	useSidebar,
 } from "@/components/ui/sidebar";
 import { Button } from "@/components/ui/button";
+import { SignedIn } from "@clerk/nextjs";
 
 declare global {
 	interface Window {
@@ -259,29 +260,31 @@ function SidebarInner({
 						</div>
 					</SidebarMenuItem>
 
-					<SidebarMenuItem>
-						<SidebarMenuButton
-							onClick={handleRefreshKnowledge}
-							disabled={isRefreshingKnowledge}
-							tooltip="Refresh Knowledge Base"
-							className="font-mono text-xs rounded-none border-0 hover:bg-sidebar-accent/30"
-						>
-							<Database
-								className={`h-4 w-4 shrink-0 ${isRefreshingKnowledge ? "animate-pulse" : ""}`}
-							/>
-							<span>
-								{isRefreshingKnowledge ? "refreshing..." : "refresh_knowledge"}
-							</span>
-							{isRefreshingKnowledge && (
-								<RotateCcw className="h-3 w-3 ml-auto animate-spin" />
+					<SignedIn>
+						<SidebarMenuItem>
+							<SidebarMenuButton
+								onClick={handleRefreshKnowledge}
+								disabled={isRefreshingKnowledge}
+								tooltip="Refresh Knowledge Base"
+								className="font-mono text-xs rounded-none border-0 hover:bg-sidebar-accent/30"
+							>
+								<Database
+									className={`h-4 w-4 shrink-0 ${isRefreshingKnowledge ? "animate-pulse" : ""}`}
+								/>
+								<span>
+									{isRefreshingKnowledge ? "refreshing..." : "refresh_knowledge"}
+								</span>
+								{isRefreshingKnowledge && (
+									<RotateCcw className="h-3 w-3 ml-auto animate-spin" />
+								)}
+							</SidebarMenuButton>
+							{refreshMessage && (
+								<div className="px-2 py-1 text-[10px] font-mono text-muted-foreground border-l-2 border-sidebar-accent ml-2">
+									{refreshMessage}
+								</div>
 							)}
-						</SidebarMenuButton>
-						{refreshMessage && (
-							<div className="px-2 py-1 text-[10px] font-mono text-muted-foreground border-l-2 border-sidebar-accent ml-2">
-								{refreshMessage}
-							</div>
-						)}
-					</SidebarMenuItem>
+						</SidebarMenuItem>
+					</SignedIn>
 				</SidebarMenu>
 			</SidebarGroup>
 		</SidebarContent>
