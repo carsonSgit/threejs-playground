@@ -1,6 +1,5 @@
 "use client";
 
-import { usePathname } from "next/navigation";
 import {
 	SidebarProvider as ShadcnSidebarProvider,
 	SidebarTrigger,
@@ -8,18 +7,6 @@ import {
 import { AppSidebar } from "@/components/app-sidebar";
 
 export function SidebarWrapper({ children }: { children: React.ReactNode }) {
-	const pathname = usePathname();
-	const isExamplePage = pathname.startsWith("/examples");
-
-	if (isExamplePage) {
-		return (
-			<ShadcnSidebarProvider defaultOpen={false}>
-				<main className="absolute inset-0 overflow-auto">{children}</main>
-				<AppSidebar />
-			</ShadcnSidebarProvider>
-		);
-	}
-
 	return (
 		<ShadcnSidebarProvider defaultOpen={true}>
 			<AppSidebar />
