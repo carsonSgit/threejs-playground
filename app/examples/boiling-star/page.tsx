@@ -20,7 +20,7 @@ export default function BoilingStarPage() {
 
 	return (
 		<>
-			<div className="fixed bottom-5 right-5 z-[1000] bg-black/70 px-4 py-3.5 rounded-md text-xs max-w-[250px]">
+			<div className="fixed bottom-5 right-5 z-[1000] bg-black/70 px-4 py-3.5 text-xs max-w-[250px]">
 				<strong>Boiling Star</strong>
 				<br />A procedural star simulation using multi-layered simplex noise,
 				dynamic surface warping, and bloom post-processing.

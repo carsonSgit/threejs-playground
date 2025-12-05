@@ -15,14 +15,23 @@ import { MockWebchat } from "@/components/mock-webchat";
 import {
 	Sidebar,
 	SidebarContent,
+	SidebarFooter,
 	SidebarGroup,
 	SidebarMenu,
 	SidebarMenuItem,
 	SidebarMenuButton,
+	SidebarSeparator,
 	useSidebar,
 } from "@/components/ui/sidebar";
 import { Button } from "@/components/ui/button";
-import { SignedIn } from "@clerk/nextjs";
+import {
+	SignedIn,
+	SignedOut,
+	SignInButton,
+	SignUpButton,
+	UserButton,
+	useUser,
+} from "@clerk/nextjs";
 
 declare global {
 	interface Window {
@@ -51,6 +60,7 @@ function SidebarInner({
 	const { state, toggleSidebar } = useSidebar();
 	const pathname = usePathname();
 	const isExamplePage = pathname.startsWith("/examples");
+	const { user } = useUser();
 
 	const handleRetryConnection = () => {
 		setIsRetrying(true);
@@ -167,7 +177,7 @@ function SidebarInner({
 								<SidebarMenuButton
 									asChild
 									tooltip="Back to Examples"
-									className="font-mono text-xs rounded-none border-0 hover:bg-sidebar-accent/30 flex-1"
+									className="font-mono text-xs border-0 hover:bg-sidebar-accent/30 flex-1"
 								>
 									<Link href="/">
 										<ArrowLeft className="h-4 w-4 shrink-0" />
@@ -179,7 +189,7 @@ function SidebarInner({
 									variant="ghost"
 									size="icon"
 									onClick={toggleSidebar}
-									className="h-8 w-8 shrink-0 rounded-none hover:bg-sidebar-accent/30 group-data-[collapsible=icon]:hidden"
+									className="h-8 w-8 shrink-0 hover:bg-sidebar-accent/30 group-data-[collapsible=icon]:hidden"
 								>
 									<X className="h-4 w-4" />
 									<span className="sr-only">Close Sidebar</span>
@@ -195,7 +205,7 @@ function SidebarInner({
 								tooltip={
 									state === "collapsed" ? "Open Sidebar" : "Toggle Assistant"
 								}
-								className="font-mono text-xs rounded-none border-0 hover:bg-sidebar-accent/30 flex-1 justify-between pr-0"
+								className="font-mono text-xs border-0 hover:bg-sidebar-accent/30 flex-1 justify-between pr-0"
 							>
 								<div className="flex items-center gap-2">
 									<Bot className="h-4 w-4 shrink-0" />
@@ -215,7 +225,7 @@ function SidebarInner({
 									variant="ghost"
 									size="icon"
 									onClick={toggleSidebar}
-									className="h-8 w-8 shrink-0 rounded-none hover:bg-sidebar-accent/30 group-data-[collapsible=icon]:hidden"
+									className="h-8 w-8 shrink-0 hover:bg-sidebar-accent/30 group-data-[collapsible=icon]:hidden"
 								>
 									<X className="h-4 w-4" />
 									<span className="sr-only">Close Sidebar</span>
@@ -259,34 +269,98 @@ function SidebarInner({
 							)}
 						</div>
 					</SidebarMenuItem>
-
-					<SignedIn>
-						<SidebarMenuItem>
-							<SidebarMenuButton
-								onClick={handleRefreshKnowledge}
-								disabled={isRefreshingKnowledge}
-								tooltip="Refresh Knowledge Base"
-								className="font-mono text-xs rounded-none border-0 hover:bg-sidebar-accent/30"
-							>
-								<Database
-									className={`h-4 w-4 shrink-0 ${isRefreshingKnowledge ? "animate-pulse" : ""}`}
-								/>
-								<span>
-									{isRefreshingKnowledge ? "refreshing..." : "refresh_knowledge"}
-								</span>
-								{isRefreshingKnowledge && (
-									<RotateCcw className="h-3 w-3 ml-auto animate-spin" />
-								)}
-							</SidebarMenuButton>
-							{refreshMessage && (
-								<div className="px-2 py-1 text-[10px] font-mono text-muted-foreground border-l-2 border-sidebar-accent ml-2">
-									{refreshMessage}
-								</div>
-							)}
-						</SidebarMenuItem>
-					</SignedIn>
 				</SidebarMenu>
 			</SidebarGroup>
+			<SidebarSeparator />
+			<SidebarFooter>
+				<SignedIn>
+					<SidebarGroup className="gap-2">
+						<SidebarMenu className="gap-0">
+							<SidebarMenuItem>
+								<SidebarMenuButton
+									onClick={handleRefreshKnowledge}
+									disabled={isRefreshingKnowledge}
+									tooltip="Refresh Knowledge Base"
+									className="font-mono text-xs border-0 bg-sidebar-background hover:bg-sidebar-accent hover:border-sidebar-accent-foreground/20 transition-all group-data-[collapsible=icon]:w-full group-data-[collapsible=icon]:justify-center"
+								>
+									<Database
+										className={`h-4 w-4 shrink-0 ${isRefreshingKnowledge ? "animate-pulse" : ""}`}
+									/>
+									<span className="group-data-[collapsible=icon]:hidden">
+										{isRefreshingKnowledge ? "refreshing..." : "refresh_knowledge"}
+									</span>
+									{isRefreshingKnowledge && (
+										<RotateCcw className="h-3 w-3 ml-auto animate-spin group-data-[collapsible=icon]:ml-0" />
+									)}
+								</SidebarMenuButton>
+								{refreshMessage && (
+									<div className="px-2 py-1 text-[10px] font-mono text-muted-foreground border-l-2 border-sidebar-accent ml-2 mt-1 group-data-[collapsible=icon]:hidden">
+										{refreshMessage}
+									</div>
+								)}
+							</SidebarMenuItem>
+						</SidebarMenu>
+
+						<div className="flex items-center gap-3 py-2 group-data-[collapsible=icon]:justify-center group-data-[collapsible=icon]:px-0">
+							<div className="flex items-center justify-center shrink-0">
+								<UserButton
+									appearance={{
+										elements: {
+											avatarBox: "h-8 w-8",
+										},
+									}}
+								/>
+							</div>
+							<div className="flex flex-col min-w-0 flex-1 group-data-[collapsible=icon]:hidden">
+								<span className="text-sm font-medium text-sidebar-foreground truncate">
+									{user?.fullName || user?.primaryEmailAddress?.emailAddress || "User"}
+								</span>
+								{user?.primaryEmailAddress?.emailAddress && user?.fullName && (
+									<span className="text-xs text-sidebar-foreground/60 truncate">
+										{user.primaryEmailAddress.emailAddress}
+									</span>
+								)}
+							</div>
+						</div>
+					</SidebarGroup>
+				</SignedIn>
+				<SignedOut>
+					<SidebarGroup className="gap-3 group-data-[collapsible=icon]:hidden">
+						<div className="flex flex-col gap-2">
+							<h3 className="text-sm font-semibold text-sidebar-foreground">
+								Get Started
+							</h3>
+							<p className="text-xs text-sidebar-foreground/70 leading-relaxed">
+								Create an account to access all features and save your progress.
+							</p>
+						</div>
+						<div className="flex gap-2">
+							<SignInButton mode="modal">
+								<Button
+									className="w-full bg-border/80 hover:bg-border/60 text-white font-medium transition-all"
+								>
+									Sign In
+								</Button>
+							</SignInButton>
+							<SignUpButton mode="modal">
+								<Button className="w-full bg-card/80 hover:bg-card/60 text-white font-medium transition-all">
+									Sign Up
+								</Button>
+							</SignUpButton>
+						</div>
+					</SidebarGroup>
+					<SidebarGroup className="group-data-[collapsible=icon]:flex group-data-[collapsible=icon]:justify-center hidden">
+						<SignUpButton mode="modal">
+							<Button
+								size="icon"
+								className="bg-card/80 hover:bg-card/60 text-white font-medium transition-all"
+							>
+								<span className="text-sm font-medium">+</span>
+							</Button>
+						</SignUpButton>
+					</SidebarGroup>
+				</SignedOut>
+			</SidebarFooter>
 		</SidebarContent>
 	);
 }
