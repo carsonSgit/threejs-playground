@@ -47,3 +47,5 @@ next-env.d.ts
 # Botpress ADK
 core/.adk/
 core/node_modules/
+# clerk configuration (can include secrets)
+/.clerk/

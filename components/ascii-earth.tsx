@@ -33,6 +33,8 @@ export default function AsciiEarth() {
 
 		containerRef.current.appendChild(renderer.domElement);
 		containerRef.current.appendChild(effect.domElement);
+		effect.domElement.style.position = "relative";
+		effect.domElement.style.left = "-150px";
 
 		// Controls
 		const controls = new OrbitControls(camera, effect.domElement);

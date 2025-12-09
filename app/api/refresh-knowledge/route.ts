@@ -1,8 +1,17 @@
 import { NextResponse } from "next/server";
+import { auth } from "@clerk/nextjs/server";
 
 export async function POST() {
-	// Knowledge refresh happens automatically when you redeploy the agent.
-	// This button provides a reminder and link to the dashboard.
+	const { userId } = await auth();
+
+	if (!userId) {
+		return NextResponse.json(
+			{ success: false, message: "Unauthorized" },
+			{ status: 401 },
+		);
+	}
+
+	// This endpoint is a reminder that knowledge refresh happens on redeployment.
 	return NextResponse.json({
 		success: true,
 		message:

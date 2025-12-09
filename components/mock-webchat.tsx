@@ -13,7 +13,7 @@ export function MockWebchat({ onRetry, isRetrying }: MockWebchatProps) {
 	return (
 		<div className="border-t border-white/10 bg-[#101010] flex flex-col h-[550px] font-mono">
 			<div className="flex items-center gap-3 p-4 border-b border-white/10 cursor-default">
-				<div className="w-10 h-10 rounded-full bg-white/10 flex items-center justify-center shrink-0">
+				<div className="w-10 h-10 bg-white/10 flex items-center justify-center shrink-0">
 					<span className="text-sm font-medium text-white">c</span>
 				</div>
 				<div className="flex-1 min-w-0">
@@ -36,7 +36,7 @@ export function MockWebchat({ onRetry, isRetrying }: MockWebchatProps) {
 			</div>
 
 			<div className="flex-1 overflow-y-auto p-2 space-y-3 cursor-default">
-				<div className="bg-yellow-400/10 border border-yellow-400/20 rounded-none p-3">
+				<div className="bg-yellow-400/10 border border-yellow-400/20 p-3">
 					<div className="flex items-start gap-2 mb-2">
 						<AlertCircle className="h-4 w-4 text-yellow-400 mt-0.5 shrink-0" />
 						<span className="text-xs font-medium text-yellow-400">
@@ -56,7 +56,7 @@ export function MockWebchat({ onRetry, isRetrying }: MockWebchatProps) {
 					<Input
 						placeholder="what kind of math do these use?"
 						disabled
-						className="flex-1 h-10 bg-[#202020] border-[#2f2f2f] text-[#525355] placeholder:text-[#F0F0F0] text-sm rounded-sm disabled:cursor-not-allowed font-mono"
+						className="flex-1 h-10 bg-[#202020] border-[#2f2f2f] text-[#525355] placeholder:text-[#F0F0F0] text-sm disabled:cursor-not-allowed font-mono"
 					/>
 				</div>
 				<div className="text-center">

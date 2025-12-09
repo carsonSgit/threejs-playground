@@ -574,6 +574,9 @@ export default function BoilingStar() {
 
 		window.addEventListener("resize", handleResize);
 
+		containerRef.current.style.position = "relative";
+		containerRef.current.style.left = "-150px";
+
 		return () => {
 			window.removeEventListener("resize", handleResize);
 			renderer.setAnimationLoop(null);
