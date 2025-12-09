@@ -11,6 +11,8 @@ import { useEffect, useRef, useState } from "react";
 import { createPortal } from "react-dom";
 import * as THREE from "three";
 import { OrbitControls } from "three/addons/controls/OrbitControls.js";
+import { Settings } from "lucide-react";
+import { useSidebar } from "@/components/ui/sidebar";
 
 interface EffectSettings {
 	showDots: boolean;
@@ -43,6 +45,9 @@ export default function ParticleNetwork() {
 	const particlesGeomRef = useRef<THREE.BufferGeometry | null>(null);
 	const settingsRef = useRef(settings);
 	const [portalTarget, setPortalTarget] = useState<HTMLElement | null>(null);
+	
+	// Get sidebar state - sidebar context should always be available via SidebarWrapper
+	const { state: sidebarState, toggleSidebar } = useSidebar();
 
 	useEffect(() => {
 		setPortalTarget(document.getElementById("sidebar-controls"));
@@ -280,6 +285,8 @@ export default function ParticleNetwork() {
 			renderer.setSize(window.innerWidth, window.innerHeight);
 		};
 
+		containerRef.current.style.position = "relative";
+		containerRef.current.style.left = "-150px";
 		window.addEventListener("resize", handleResize);
 
 		return () => {
@@ -307,116 +314,128 @@ export default function ParticleNetwork() {
 			<div ref={containerRef} className="w-full h-full" />
 			{portalTarget &&
 				createPortal(
-					<div className="p-4 space-y-4 text-xs">
-						<h3 className="font-semibold mb-3 text-sidebar-foreground">
-							Network Controls
-						</h3>
-						<div className="space-y-4">
-							<label className="flex items-center justify-between cursor-pointer">
-								<span className="text-sidebar-foreground/80">Show Dots</span>
-								<input
-									type="checkbox"
-									checked={settings.showDots}
-									onChange={(e) =>
-										setSettings((s) => ({ ...s, showDots: e.target.checked }))
-									}
-									className="w-4 h-4 accent-sidebar-accent-foreground cursor-pointer"
-								/>
-							</label>
+					sidebarState === "collapsed" ? (
+						<div className="flex items-center justify-center h-full">
+							<button
+								onClick={toggleSidebar}
+								className="flex items-center justify-center w-8 h-8 rounded hover:bg-sidebar-accent transition-colors text-sidebar-foreground hover:text-sidebar-accent-foreground"
+								aria-label="Open Settings"
+							>
+								<Settings className="h-4 w-4" />
+							</button>
+						</div>
+					) : (
+						<div className="p-4 space-y-4 text-xs">
+							<h3 className="font-semibold mb-3 text-sidebar-foreground">
+								Network Controls
+							</h3>
+							<div className="space-y-4">
+								<label className="flex items-center justify-between cursor-pointer">
+									<span className="text-sidebar-foreground/80">Show Dots</span>
+									<input
+										type="checkbox"
+										checked={settings.showDots}
+										onChange={(e) =>
+											setSettings((s) => ({ ...s, showDots: e.target.checked }))
+										}
+										className="w-4 h-4 accent-sidebar-accent-foreground cursor-pointer"
+									/>
+								</label>
 
-							<label className="flex items-center justify-between cursor-pointer">
-								<span className="text-sidebar-foreground/80">Show Lines</span>
-								<input
-									type="checkbox"
-									checked={settings.showLines}
-									onChange={(e) =>
-										setSettings((s) => ({ ...s, showLines: e.target.checked }))
-									}
-									className="w-4 h-4 accent-sidebar-accent-foreground cursor-pointer"
-								/>
-							</label>
+								<label className="flex items-center justify-between cursor-pointer">
+									<span className="text-sidebar-foreground/80">Show Lines</span>
+									<input
+										type="checkbox"
+										checked={settings.showLines}
+										onChange={(e) =>
+											setSettings((s) => ({ ...s, showLines: e.target.checked }))
+										}
+										className="w-4 h-4 accent-sidebar-accent-foreground cursor-pointer"
+									/>
+								</label>
 
-							<div className="space-y-2">
-								<div className="flex justify-between text-sidebar-foreground/80">
-									<span>Distance</span>
-									<span>{settings.minDistance}</span>
+								<div className="space-y-2">
+									<div className="flex justify-between text-sidebar-foreground/80">
+										<span>Distance</span>
+										<span>{settings.minDistance}</span>
+									</div>
+									<input
+										type="range"
+										min="10"
+										max="300"
+										value={settings.minDistance}
+										onChange={(e) =>
+											setSettings((s) => ({
+												...s,
+												minDistance: Number(e.target.value),
+											}))
+										}
+										className="w-full h-1 bg-sidebar-border rounded-full appearance-none cursor-pointer [&::-webkit-slider-thumb]:appearance-none [&::-webkit-slider-thumb]:w-2.5 [&::-webkit-slider-thumb]:h-2.5 [&::-webkit-slider-thumb]:bg-sidebar-foreground [&::-webkit-slider-thumb]:rounded-full hover:[&::-webkit-slider-thumb]:bg-sidebar-accent-foreground"
+									/>
 								</div>
-								<input
-									type="range"
-									min="10"
-									max="300"
-									value={settings.minDistance}
-									onChange={(e) =>
-										setSettings((s) => ({
-											...s,
-											minDistance: Number(e.target.value),
-										}))
-									}
-									className="w-full h-1 bg-sidebar-border rounded-full appearance-none cursor-pointer [&::-webkit-slider-thumb]:appearance-none [&::-webkit-slider-thumb]:w-2.5 [&::-webkit-slider-thumb]:h-2.5 [&::-webkit-slider-thumb]:bg-sidebar-foreground [&::-webkit-slider-thumb]:rounded-full hover:[&::-webkit-slider-thumb]:bg-sidebar-accent-foreground"
-								/>
-							</div>
 
-							<label className="flex items-center justify-between cursor-pointer">
-								<span className="text-sidebar-foreground/80">
-									Limit Connections
-								</span>
-								<input
-									type="checkbox"
-									checked={settings.limitConnections}
-									onChange={(e) =>
-										setSettings((s) => ({
-											...s,
-											limitConnections: e.target.checked,
-										}))
-									}
-									className="w-4 h-4 accent-sidebar-accent-foreground cursor-pointer"
-								/>
-							</label>
+								<label className="flex items-center justify-between cursor-pointer">
+									<span className="text-sidebar-foreground/80">
+										Limit Connections
+									</span>
+									<input
+										type="checkbox"
+										checked={settings.limitConnections}
+										onChange={(e) =>
+											setSettings((s) => ({
+												...s,
+												limitConnections: e.target.checked,
+											}))
+										}
+										className="w-4 h-4 accent-sidebar-accent-foreground cursor-pointer"
+									/>
+								</label>
 
-							<div className="space-y-2">
-								<div className="flex justify-between text-sidebar-foreground/80">
-									<span>Max Conn.</span>
-									<span>{settings.maxConnections}</span>
+								<div className="space-y-2">
+									<div className="flex justify-between text-sidebar-foreground/80">
+										<span>Max Conn.</span>
+										<span>{settings.maxConnections}</span>
+									</div>
+									<input
+										type="range"
+										min="0"
+										max="30"
+										step="1"
+										value={settings.maxConnections}
+										onChange={(e) =>
+											setSettings((s) => ({
+												...s,
+												maxConnections: Number(e.target.value),
+											}))
+										}
+										disabled={!settings.limitConnections}
+										className="w-full h-1 bg-sidebar-border rounded-full appearance-none cursor-pointer disabled:opacity-30 [&::-webkit-slider-thumb]:appearance-none [&::-webkit-slider-thumb]:w-2.5 [&::-webkit-slider-thumb]:h-2.5 [&::-webkit-slider-thumb]:bg-sidebar-foreground [&::-webkit-slider-thumb]:rounded-full hover:[&::-webkit-slider-thumb]:bg-sidebar-accent-foreground"
+									/>
 								</div>
-								<input
-									type="range"
-									min="0"
-									max="30"
-									step="1"
-									value={settings.maxConnections}
-									onChange={(e) =>
-										setSettings((s) => ({
-											...s,
-											maxConnections: Number(e.target.value),
-										}))
-									}
-									disabled={!settings.limitConnections}
-									className="w-full h-1 bg-sidebar-border rounded-full appearance-none cursor-pointer disabled:opacity-30 [&::-webkit-slider-thumb]:appearance-none [&::-webkit-slider-thumb]:w-2.5 [&::-webkit-slider-thumb]:h-2.5 [&::-webkit-slider-thumb]:bg-sidebar-foreground [&::-webkit-slider-thumb]:rounded-full hover:[&::-webkit-slider-thumb]:bg-sidebar-accent-foreground"
-								/>
-							</div>
 
-							<div className="space-y-2">
-								<div className="flex justify-between text-sidebar-foreground/80">
-									<span>Particles</span>
-									<span>{settings.particleCount}</span>
+								<div className="space-y-2">
+									<div className="flex justify-between text-sidebar-foreground/80">
+										<span>Particles</span>
+										<span>{settings.particleCount}</span>
+									</div>
+									<input
+										type="range"
+										min="0"
+										max="1000"
+										step="1"
+										value={settings.particleCount}
+										onChange={(e) =>
+											setSettings((s) => ({
+												...s,
+												particleCount: Number(e.target.value),
+											}))
+										}
+										className="w-full h-1 bg-sidebar-border rounded-full appearance-none cursor-pointer [&::-webkit-slider-thumb]:appearance-none [&::-webkit-slider-thumb]:w-2.5 [&::-webkit-slider-thumb]:h-2.5 [&::-webkit-slider-thumb]:bg-sidebar-foreground [&::-webkit-slider-thumb]:rounded-full hover:[&::-webkit-slider-thumb]:bg-sidebar-accent-foreground"
+									/>
 								</div>
-								<input
-									type="range"
-									min="0"
-									max="1000"
-									step="1"
-									value={settings.particleCount}
-									onChange={(e) =>
-										setSettings((s) => ({
-											...s,
-											particleCount: Number(e.target.value),
-										}))
-									}
-									className="w-full h-1 bg-sidebar-border rounded-full appearance-none cursor-pointer [&::-webkit-slider-thumb]:appearance-none [&::-webkit-slider-thumb]:w-2.5 [&::-webkit-slider-thumb]:h-2.5 [&::-webkit-slider-thumb]:bg-sidebar-foreground [&::-webkit-slider-thumb]:rounded-full hover:[&::-webkit-slider-thumb]:bg-sidebar-accent-foreground"
-								/>
 							</div>
 						</div>
-					</div>,
+					),
 					portalTarget,
 				)}
 		</>
