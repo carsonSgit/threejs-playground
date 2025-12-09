@@ -372,228 +372,228 @@ void main() {
 `;
 
 export default function BoilingStar() {
-  const containerRef = useRef<HTMLDivElement>(null);
+	const containerRef = useRef<HTMLDivElement>(null);
 
-  useEffect(() => {
-    if (!containerRef.current) return;
+	useEffect(() => {
+		if (!containerRef.current) return;
 
-    const scene = new THREE.Scene();
-    scene.background = new THREE.Color(0x000000);
+		const scene = new THREE.Scene();
+		scene.background = new THREE.Color(0x000000);
 
-    const camera = new THREE.PerspectiveCamera(
-      60,
-      window.innerWidth / window.innerHeight,
-      0.1,
-      1000,
-    );
-    camera.position.set(0, 0, 6);
+		const camera = new THREE.PerspectiveCamera(
+			60,
+			window.innerWidth / window.innerHeight,
+			0.1,
+			1000,
+		);
+		camera.position.set(0, 0, 6);
 
-    const renderer = new THREE.WebGLRenderer({
-      antialias: true,
-      powerPreference: "high-performance",
-      stencil: false,
-    });
-    renderer.setSize(window.innerWidth, window.innerHeight);
-    renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
-    containerRef.current.appendChild(renderer.domElement);
+		const renderer = new THREE.WebGLRenderer({
+			antialias: true,
+			powerPreference: "high-performance",
+			stencil: false,
+		});
+		renderer.setSize(window.innerWidth, window.innerHeight);
+		renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
+		containerRef.current.appendChild(renderer.domElement);
 
-    const controls = new OrbitControls(camera, renderer.domElement);
-    controls.enableDamping = true;
-    controls.dampingFactor = 0.05;
-    controls.minDistance = 3;
-    controls.maxDistance = 15;
+		const controls = new OrbitControls(camera, renderer.domElement);
+		controls.enableDamping = true;
+		controls.dampingFactor = 0.05;
+		controls.minDistance = 3;
+		controls.maxDistance = 15;
 
-    const starGeometry = new THREE.SphereGeometry(2, 64, 64);
-    const starMaterial = new THREE.ShaderMaterial({
-      vertexShader,
-      fragmentShader,
-      uniforms: {
-        uTime: { value: 0 },
-        uBaseColor: { value: new THREE.Color(1.0, 0.3, 0.05) },
-        uCoreColor: { value: new THREE.Color(1.0, 0.95, 0.7) },
-      },
-    });
+		const starGeometry = new THREE.SphereGeometry(2, 64, 64);
+		const starMaterial = new THREE.ShaderMaterial({
+			vertexShader,
+			fragmentShader,
+			uniforms: {
+				uTime: { value: 0 },
+				uBaseColor: { value: new THREE.Color(1.0, 0.3, 0.05) },
+				uCoreColor: { value: new THREE.Color(1.0, 0.95, 0.7) },
+			},
+		});
 
-    const star = new THREE.Mesh(starGeometry, starMaterial);
-    scene.add(star);
+		const star = new THREE.Mesh(starGeometry, starMaterial);
+		scene.add(star);
 
-    const coronaGeometry = new THREE.SphereGeometry(2.15, 48, 48);
-    const coronaMaterial = new THREE.ShaderMaterial({
-      vertexShader: coronaVertexShader,
-      fragmentShader: coronaFragmentShader,
-      uniforms: {
-        uTime: { value: 0 },
-        uCoronaColor: { value: new THREE.Color(1.0, 0.25, 0.1) },
-      },
-      transparent: true,
-      blending: THREE.AdditiveBlending,
-      side: THREE.BackSide,
-    });
+		const coronaGeometry = new THREE.SphereGeometry(2.15, 48, 48);
+		const coronaMaterial = new THREE.ShaderMaterial({
+			vertexShader: coronaVertexShader,
+			fragmentShader: coronaFragmentShader,
+			uniforms: {
+				uTime: { value: 0 },
+				uCoronaColor: { value: new THREE.Color(1.0, 0.25, 0.1) },
+			},
+			transparent: true,
+			blending: THREE.AdditiveBlending,
+			side: THREE.BackSide,
+		});
 
-    const corona = new THREE.Mesh(coronaGeometry, coronaMaterial);
-    scene.add(corona);
+		const corona = new THREE.Mesh(coronaGeometry, coronaMaterial);
+		scene.add(corona);
 
-    const numFlareStreams = 30;
-    const particlesPerStream = 20;
-    const totalParticles = numFlareStreams * particlesPerStream;
+		const numFlareStreams = 30;
+		const particlesPerStream = 20;
+		const totalParticles = numFlareStreams * particlesPerStream;
 
-    const flareGeometry = new THREE.BufferGeometry();
-    const positions = new Float32Array(totalParticles * 3);
-    const lifePhases = new Float32Array(totalParticles);
-    const sourcePosArray = new Float32Array(totalParticles * 3);
-    const directions = new Float32Array(totalParticles * 3);
-    const speeds = new Float32Array(totalParticles);
-    const flareGroups = new Float32Array(totalParticles);
+		const flareGeometry = new THREE.BufferGeometry();
+		const positions = new Float32Array(totalParticles * 3);
+		const lifePhases = new Float32Array(totalParticles);
+		const sourcePosArray = new Float32Array(totalParticles * 3);
+		const directions = new Float32Array(totalParticles * 3);
+		const speeds = new Float32Array(totalParticles);
+		const flareGroups = new Float32Array(totalParticles);
 
-    let idx = 0;
-    for (let stream = 0; stream < numFlareStreams; stream++) {
-      const phi = Math.acos(2 * Math.random() - 1);
-      const theta = Math.random() * Math.PI * 2;
-      const radius = 1.0;
+		let idx = 0;
+		for (let stream = 0; stream < numFlareStreams; stream++) {
+			const phi = Math.acos(2 * Math.random() - 1);
+			const theta = Math.random() * Math.PI * 2;
+			const radius = 1.0;
 
-      const sourceX = radius * Math.sin(phi) * Math.cos(theta);
-      const sourceY = radius * Math.sin(phi) * Math.sin(theta);
-      const sourceZ = radius * Math.cos(phi);
+			const sourceX = radius * Math.sin(phi) * Math.cos(theta);
+			const sourceY = radius * Math.sin(phi) * Math.sin(theta);
+			const sourceZ = radius * Math.cos(phi);
 
-      const dirLen = Math.sqrt(
-        sourceX * sourceX + sourceY * sourceY + sourceZ * sourceZ,
-      );
-      const dirX = sourceX / dirLen;
-      const dirY = sourceY / dirLen;
-      const dirZ = sourceZ / dirLen;
+			const dirLen = Math.sqrt(
+				sourceX * sourceX + sourceY * sourceY + sourceZ * sourceZ,
+			);
+			const dirX = sourceX / dirLen;
+			const dirY = sourceY / dirLen;
+			const dirZ = sourceZ / dirLen;
 
-      for (let p = 0; p < particlesPerStream; p++) {
-        const i = idx * 3;
+			for (let p = 0; p < particlesPerStream; p++) {
+				const i = idx * 3;
 
-        positions[i] = sourceX;
-        positions[i + 1] = sourceY;
-        positions[i + 2] = sourceZ;
+				positions[i] = sourceX;
+				positions[i + 1] = sourceY;
+				positions[i + 2] = sourceZ;
 
-        lifePhases[idx] = p / particlesPerStream;
+				lifePhases[idx] = p / particlesPerStream;
 
-        sourcePosArray[i] = sourceX;
-        sourcePosArray[i + 1] = sourceY;
-        sourcePosArray[i + 2] = sourceZ;
+				sourcePosArray[i] = sourceX;
+				sourcePosArray[i + 1] = sourceY;
+				sourcePosArray[i + 2] = sourceZ;
 
-        const spread = 0.3;
-        directions[i] = dirX + (Math.random() - 1) * spread;
-        directions[i + 1] = dirY + (Math.random() - 0.1) * spread;
-        directions[i + 2] = dirZ + (Math.random() - 0.1) * spread;
+				const spread = 0.3;
+				directions[i] = dirX + (Math.random() - 1) * spread;
+				directions[i + 1] = dirY + (Math.random() - 0.1) * spread;
+				directions[i + 2] = dirZ + (Math.random() - 0.1) * spread;
 
-        speeds[idx] = 0.8 + Math.random() * 0.4;
+				speeds[idx] = 0.8 + Math.random() * 0.4;
 
-        flareGroups[idx] = stream;
+				flareGroups[idx] = stream;
 
-        idx++;
-      }
-    }
+				idx++;
+			}
+		}
 
-    flareGeometry.setAttribute(
-      "position",
-      new THREE.BufferAttribute(positions, 3),
-    );
-    flareGeometry.setAttribute(
-      "aLifePhase",
-      new THREE.BufferAttribute(lifePhases, 1),
-    );
-    flareGeometry.setAttribute(
-      "aSourcePos",
-      new THREE.BufferAttribute(sourcePosArray, 3),
-    );
-    flareGeometry.setAttribute(
-      "aDirection",
-      new THREE.BufferAttribute(directions, 3),
-    );
-    flareGeometry.setAttribute("aSpeed", new THREE.BufferAttribute(speeds, 1));
-    flareGeometry.setAttribute(
-      "aFlareGroup",
-      new THREE.BufferAttribute(flareGroups, 1),
-    );
+		flareGeometry.setAttribute(
+			"position",
+			new THREE.BufferAttribute(positions, 3),
+		);
+		flareGeometry.setAttribute(
+			"aLifePhase",
+			new THREE.BufferAttribute(lifePhases, 1),
+		);
+		flareGeometry.setAttribute(
+			"aSourcePos",
+			new THREE.BufferAttribute(sourcePosArray, 3),
+		);
+		flareGeometry.setAttribute(
+			"aDirection",
+			new THREE.BufferAttribute(directions, 3),
+		);
+		flareGeometry.setAttribute("aSpeed", new THREE.BufferAttribute(speeds, 1));
+		flareGeometry.setAttribute(
+			"aFlareGroup",
+			new THREE.BufferAttribute(flareGroups, 1),
+		);
 
-    const flareMaterial = new THREE.ShaderMaterial({
-      vertexShader: particleFlareVertexShader,
-      fragmentShader: particleFlareFragmentShader,
-      uniforms: {
-        uTime: { value: 0 },
-        uStarRadius: { value: 2.0 },
-      },
-      transparent: true,
-      blending: THREE.AdditiveBlending,
-      depthWrite: false,
-    });
+		const flareMaterial = new THREE.ShaderMaterial({
+			vertexShader: particleFlareVertexShader,
+			fragmentShader: particleFlareFragmentShader,
+			uniforms: {
+				uTime: { value: 0 },
+				uStarRadius: { value: 2.0 },
+			},
+			transparent: true,
+			blending: THREE.AdditiveBlending,
+			depthWrite: false,
+		});
 
-    const flareParticles = new THREE.Points(flareGeometry, flareMaterial);
-    flareParticles.frustumCulled = false;
-    scene.add(flareParticles);
+		const flareParticles = new THREE.Points(flareGeometry, flareMaterial);
+		flareParticles.frustumCulled = false;
+		scene.add(flareParticles);
 
-    const composer = new EffectComposer(renderer);
-    composer.addPass(new RenderPass(scene, camera));
+		const composer = new EffectComposer(renderer);
+		composer.addPass(new RenderPass(scene, camera));
 
-    const bloomResolution = new THREE.Vector2(
-      window.innerWidth * 0.8,
-      window.innerHeight * 0.8,
-    );
-    const bloomPass = new UnrealBloomPass(
-      bloomResolution,
-      2.2, // strength for dramatic flares
-      0.5, // radius
-      0.05, // lower for more glow
-    );
-    composer.addPass(bloomPass);
+		const bloomResolution = new THREE.Vector2(
+			window.innerWidth * 0.8,
+			window.innerHeight * 0.8,
+		);
+		const bloomPass = new UnrealBloomPass(
+			bloomResolution,
+			2.2, // strength for dramatic flares
+			0.5, // radius
+			0.05, // lower for more glow
+		);
+		composer.addPass(bloomPass);
 
-    let time = 0;
-    function animate() {
-      time += 0.016; // 60fps delta
+		let time = 0;
+		function animate() {
+			time += 0.016; // 60fps delta
 
-      starMaterial.uniforms.uTime.value = time;
-      coronaMaterial.uniforms.uTime.value = time;
-      flareMaterial.uniforms.uTime.value = time;
+			starMaterial.uniforms.uTime.value = time;
+			coronaMaterial.uniforms.uTime.value = time;
+			flareMaterial.uniforms.uTime.value = time;
 
-      star.rotation.y += 0.001;
-      corona.rotation.y -= 0.0008;
-      corona.rotation.x += 0.0005;
+			star.rotation.y += 0.001;
+			corona.rotation.y -= 0.0008;
+			corona.rotation.x += 0.0005;
 
-      controls.update();
-      composer.render();
-    }
+			controls.update();
+			composer.render();
+		}
 
-    renderer.setAnimationLoop(animate);
+		renderer.setAnimationLoop(animate);
 
-    const handleResize = () => {
-      const w = window.innerWidth;
-      const h = window.innerHeight;
+		const handleResize = () => {
+			const w = window.innerWidth;
+			const h = window.innerHeight;
 
-      camera.aspect = w / h;
-      camera.updateProjectionMatrix();
+			camera.aspect = w / h;
+			camera.updateProjectionMatrix();
 
-      renderer.setSize(w, h);
-      composer.setSize(w, h);
+			renderer.setSize(w, h);
+			composer.setSize(w, h);
 
-      bloomPass.resolution.set(w * 0.8, h * 0.8);
-    };
+			bloomPass.resolution.set(w * 0.8, h * 0.8);
+		};
 
-    window.addEventListener("resize", handleResize);
+		window.addEventListener("resize", handleResize);
 
-    containerRef.current.style.position = "relative";
-    containerRef.current.style.left = "-150px";
+		containerRef.current.style.position = "relative";
+		containerRef.current.style.left = "-150px";
 
-    return () => {
-      window.removeEventListener("resize", handleResize);
-      renderer.setAnimationLoop(null);
-      controls.dispose();
-      starGeometry.dispose();
-      starMaterial.dispose();
-      coronaGeometry.dispose();
-      coronaMaterial.dispose();
-      flareGeometry.dispose();
-      flareMaterial.dispose();
-      renderer.dispose();
+		return () => {
+			window.removeEventListener("resize", handleResize);
+			renderer.setAnimationLoop(null);
+			controls.dispose();
+			starGeometry.dispose();
+			starMaterial.dispose();
+			coronaGeometry.dispose();
+			coronaMaterial.dispose();
+			flareGeometry.dispose();
+			flareMaterial.dispose();
+			renderer.dispose();
 
-      if (containerRef.current) {
-        containerRef.current.innerHTML = "";
-      }
-    };
-  }, []);
+			if (containerRef.current) {
+				containerRef.current.innerHTML = "";
+			}
+		};
+	}, []);
 
-  return <div ref={containerRef} className="w-full h-full" />;
+	return <div ref={containerRef} className="w-full h-full" />;
 }

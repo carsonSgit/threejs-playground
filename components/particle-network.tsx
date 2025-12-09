@@ -45,7 +45,7 @@ export default function ParticleNetwork() {
 	const particlesGeomRef = useRef<THREE.BufferGeometry | null>(null);
 	const settingsRef = useRef(settings);
 	const [portalTarget, setPortalTarget] = useState<HTMLElement | null>(null);
-	
+
 	// Get sidebar state - sidebar context should always be available via SidebarWrapper
 	const { state: sidebarState, toggleSidebar } = useSidebar();
 
@@ -348,7 +348,10 @@ export default function ParticleNetwork() {
 										type="checkbox"
 										checked={settings.showLines}
 										onChange={(e) =>
-											setSettings((s) => ({ ...s, showLines: e.target.checked }))
+											setSettings((s) => ({
+												...s,
+												showLines: e.target.checked,
+											}))
 										}
 										className="w-4 h-4 accent-sidebar-accent-foreground cursor-pointer"
 									/>

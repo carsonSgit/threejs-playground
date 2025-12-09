@@ -214,8 +214,9 @@ function SidebarInner({
 									</div>
 									<div className="h-8 w-8 flex items-center justify-center shrink-0 group-data-[collapsible=icon]:hidden">
 										<ChevronDown
-											className={`h-4 w-4 transition-transform duration-200 ${chatVisible ? "rotate-180" : "rotate-0"
-												}`}
+											className={`h-4 w-4 transition-transform duration-200 ${
+												chatVisible ? "rotate-180" : "rotate-0"
+											}`}
 										/>
 									</div>
 								</SidebarMenuButton>
@@ -234,12 +235,13 @@ function SidebarInner({
 							</div>
 
 							<div
-								className={`overflow-hidden transition-all duration-300 ease-in-out group-data-[collapsible=icon]:hidden ${chatVisible
-									? hasQuotaError
-										? "max-h-[550px] opacity-100"
-										: "max-h-96 opacity-100"
-									: "max-h-0 opacity-0"
-									}`}
+								className={`overflow-hidden transition-all duration-300 ease-in-out group-data-[collapsible=icon]:hidden ${
+									chatVisible
+										? hasQuotaError
+											? "max-h-[550px] opacity-100"
+											: "max-h-96 opacity-100"
+										: "max-h-0 opacity-0"
+								}`}
 							>
 								{botpressStatus === "loading" && (
 									<div className="border-t border-sidebar-border bg-sidebar-accent/30 px-2 py-2">
@@ -288,7 +290,9 @@ function SidebarInner({
 										className={`h-4 w-4 shrink-0 ${isRefreshingKnowledge ? "animate-pulse" : ""}`}
 									/>
 									<span className="group-data-[collapsible=icon]:hidden">
-										{isRefreshingKnowledge ? "refreshing..." : "refresh_knowledge"}
+										{isRefreshingKnowledge
+											? "refreshing..."
+											: "refresh_knowledge"}
 									</span>
 									{isRefreshingKnowledge && (
 										<RotateCcw className="h-3 w-3 ml-auto animate-spin group-data-[collapsible=icon]:ml-0" />
@@ -314,7 +318,9 @@ function SidebarInner({
 							</div>
 							<div className="flex flex-col min-w-0 flex-1 group-data-[collapsible=icon]:hidden">
 								<span className="text-sm font-medium text-sidebar-foreground truncate">
-									{user?.fullName || user?.primaryEmailAddress?.emailAddress || "User"}
+									{user?.fullName ||
+										user?.primaryEmailAddress?.emailAddress ||
+										"User"}
 								</span>
 								{user?.primaryEmailAddress?.emailAddress && user?.fullName && (
 									<span className="text-xs text-sidebar-foreground/60 truncate">
@@ -337,9 +343,7 @@ function SidebarInner({
 						</div>
 						<div className="flex gap-2">
 							<SignInButton mode="modal">
-								<Button
-									className="w-full bg-border/80 hover:bg-border/60 text-white font-medium transition-all"
-								>
+								<Button className="w-full bg-border/80 hover:bg-border/60 text-white font-medium transition-all">
 									Sign In
 								</Button>
 							</SignInButton>
@@ -389,8 +393,8 @@ export function AppSidebar({
 			style={
 				shouldWiden
 					? ({
-						"--sidebar-width": "350px",
-					} as React.CSSProperties)
+							"--sidebar-width": "350px",
+						} as React.CSSProperties)
 					: undefined
 			}
 		>
