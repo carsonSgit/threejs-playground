@@ -168,111 +168,112 @@ function SidebarInner({
 	};
 
 	return (
-		<SidebarContent>
-			<SidebarGroup>
-				<SidebarMenu className="gap-0">
-					{isExamplePage && (
+		<>
+			<SidebarContent>
+				<SidebarGroup>
+					<SidebarMenu className="gap-0">
+						{isExamplePage && (
+							<SidebarMenuItem>
+								<div className="flex items-center">
+									<SidebarMenuButton
+										asChild
+										tooltip="Back to Examples"
+										className="font-mono text-xs border-0 hover:bg-sidebar-accent/30 flex-1"
+									>
+										<Link href="/">
+											<ArrowLeft className="h-4 w-4 shrink-0" />
+											<span>back_to_examples</span>
+										</Link>
+									</SidebarMenuButton>
+
+									<Button
+										variant="ghost"
+										size="icon"
+										onClick={toggleSidebar}
+										className="h-8 w-8 shrink-0 hover:bg-sidebar-accent/30 group-data-[collapsible=icon]:hidden"
+									>
+										<X className="h-4 w-4" />
+										<span className="sr-only">Close Sidebar</span>
+									</Button>
+								</div>
+							</SidebarMenuItem>
+						)}
+
 						<SidebarMenuItem>
 							<div className="flex items-center">
 								<SidebarMenuButton
-									asChild
-									tooltip="Back to Examples"
-									className="font-mono text-xs border-0 hover:bg-sidebar-accent/30 flex-1"
+									onClick={handleBotClick}
+									tooltip={
+										state === "collapsed" ? "Open Sidebar" : "Toggle Assistant"
+									}
+									className="font-mono text-xs border-0 hover:bg-sidebar-accent/30 flex-1 justify-between pr-0"
 								>
-									<Link href="/">
-										<ArrowLeft className="h-4 w-4 shrink-0" />
-										<span>back_to_examples</span>
-									</Link>
+									<div className="flex items-center gap-2">
+										<Bot className="h-4 w-4 shrink-0" />
+										<span>{chatVisible ? "hide_webchat" : "show_webchat"}</span>
+									</div>
+									<div className="h-8 w-8 flex items-center justify-center shrink-0 group-data-[collapsible=icon]:hidden">
+										<ChevronDown
+											className={`h-4 w-4 transition-transform duration-200 ${chatVisible ? "rotate-180" : "rotate-0"
+												}`}
+										/>
+									</div>
 								</SidebarMenuButton>
 
-								<Button
-									variant="ghost"
-									size="icon"
-									onClick={toggleSidebar}
-									className="h-8 w-8 shrink-0 hover:bg-sidebar-accent/30 group-data-[collapsible=icon]:hidden"
-								>
-									<X className="h-4 w-4" />
-									<span className="sr-only">Close Sidebar</span>
-								</Button>
+								{!isExamplePage && (
+									<Button
+										variant="ghost"
+										size="icon"
+										onClick={toggleSidebar}
+										className="h-8 w-8 shrink-0 hover:bg-sidebar-accent/30 group-data-[collapsible=icon]:hidden"
+									>
+										<X className="h-4 w-4" />
+										<span className="sr-only">Close Sidebar</span>
+									</Button>
+								)}
 							</div>
-						</SidebarMenuItem>
-					)}
 
-					<SidebarMenuItem>
-						<div className="flex items-center">
-							<SidebarMenuButton
-								onClick={handleBotClick}
-								tooltip={
-									state === "collapsed" ? "Open Sidebar" : "Toggle Assistant"
-								}
-								className="font-mono text-xs border-0 hover:bg-sidebar-accent/30 flex-1 justify-between pr-0"
-							>
-								<div className="flex items-center gap-2">
-									<Bot className="h-4 w-4 shrink-0" />
-									<span>{chatVisible ? "hide_webchat" : "show_webchat"}</span>
-								</div>
-								<div className="h-8 w-8 flex items-center justify-center shrink-0 group-data-[collapsible=icon]:hidden">
-									<ChevronDown
-										className={`h-4 w-4 transition-transform duration-200 ${
-											chatVisible ? "rotate-180" : "rotate-0"
-										}`}
-									/>
-								</div>
-							</SidebarMenuButton>
-
-							{!isExamplePage && (
-								<Button
-									variant="ghost"
-									size="icon"
-									onClick={toggleSidebar}
-									className="h-8 w-8 shrink-0 hover:bg-sidebar-accent/30 group-data-[collapsible=icon]:hidden"
-								>
-									<X className="h-4 w-4" />
-									<span className="sr-only">Close Sidebar</span>
-								</Button>
-							)}
-						</div>
-
-						<div
-							className={`overflow-hidden transition-all duration-300 ease-in-out group-data-[collapsible=icon]:hidden ${
-								chatVisible
+							<div
+								className={`overflow-hidden transition-all duration-300 ease-in-out group-data-[collapsible=icon]:hidden ${chatVisible
 									? hasQuotaError
 										? "max-h-[550px] opacity-100"
 										: "max-h-96 opacity-100"
 									: "max-h-0 opacity-0"
-							}`}
-						>
-							{botpressStatus === "loading" && (
-								<div className="border-t border-sidebar-border bg-sidebar-accent/30 px-2 py-2">
-									<div className="text-xs text-muted-foreground font-mono text-center animate-pulse">
-										loading assistant...
+									}`}
+							>
+								{botpressStatus === "loading" && (
+									<div className="border-t border-sidebar-border bg-sidebar-accent/30 px-2 py-2">
+										<div className="text-xs text-muted-foreground font-mono text-center animate-pulse">
+											loading assistant...
+										</div>
 									</div>
-								</div>
-							)}
+								)}
 
-							{botpressStatus === "error" && hasQuotaError && (
-								<MockWebchat
-									onRetry={handleRetryConnection}
-									isRetrying={isRetrying}
-								/>
-							)}
+								{botpressStatus === "error" && hasQuotaError && (
+									<MockWebchat
+										onRetry={handleRetryConnection}
+										isRetrying={isRetrying}
+									/>
+								)}
 
-							{botpressStatus === "ready" && !hasQuotaError && (
-								<div className="border-t border-sidebar-border bg-sidebar-accent/30 px-2 py-2">
-									<div className="text-xs text-muted-foreground font-mono">
-										<span className="text-green-400">●</span> webchat active
+								{botpressStatus === "ready" && !hasQuotaError && (
+									<div className="border-t border-sidebar-border bg-sidebar-accent/30 px-2 py-2">
+										<div className="text-xs text-muted-foreground font-mono">
+											<span className="text-green-400">●</span> webchat active
+										</div>
+										<p className="mt-1 text-[10px] text-sidebar-foreground/50 font-mono">
+											chat widget appears in bottom-right corner.
+										</p>
 									</div>
-									<p className="mt-1 text-[10px] text-sidebar-foreground/50 font-mono">
-										chat widget appears in bottom-right corner.
-									</p>
-								</div>
-							)}
-						</div>
-					</SidebarMenuItem>
-				</SidebarMenu>
-			</SidebarGroup>
+								)}
+							</div>
+						</SidebarMenuItem>
+					</SidebarMenu>
+				</SidebarGroup>
+				<div id="sidebar-controls" className="w-full" />
+			</SidebarContent>
 			<SidebarSeparator />
-			<SidebarFooter>
+			<SidebarFooter className="py-2">
 				<SignedIn>
 					<SidebarGroup className="gap-2">
 						<SidebarMenu className="gap-0">
@@ -361,7 +362,7 @@ function SidebarInner({
 					</SidebarGroup>
 				</SignedOut>
 			</SidebarFooter>
-		</SidebarContent>
+		</>
 	);
 }
 
@@ -388,8 +389,8 @@ export function AppSidebar({
 			style={
 				shouldWiden
 					? ({
-							"--sidebar-width": "350px",
-						} as React.CSSProperties)
+						"--sidebar-width": "350px",
+					} as React.CSSProperties)
 					: undefined
 			}
 		>

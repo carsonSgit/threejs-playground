@@ -8,6 +8,7 @@
  */
 
 import { useEffect, useRef, useState } from "react";
+import { createPortal } from "react-dom";
 import * as THREE from "three";
 import { OrbitControls } from "three/addons/controls/OrbitControls.js";
 
@@ -41,6 +42,11 @@ export default function ParticleNetwork() {
 	const linesMeshRef = useRef<THREE.LineSegments | null>(null);
 	const particlesGeomRef = useRef<THREE.BufferGeometry | null>(null);
 	const settingsRef = useRef(settings);
+	const [portalTarget, setPortalTarget] = useState<HTMLElement | null>(null);
+
+	useEffect(() => {
+		setPortalTarget(document.getElementById("sidebar-controls"));
+	}, []);
 
 	useEffect(() => {
 		settingsRef.current = settings;
@@ -299,114 +305,120 @@ export default function ParticleNetwork() {
 	return (
 		<>
 			<div ref={containerRef} className="w-full h-full" />
+			{portalTarget &&
+				createPortal(
+					<div className="p-4 space-y-4 text-xs">
+						<h3 className="font-semibold mb-3 text-sidebar-foreground">
+							Network Controls
+						</h3>
+						<div className="space-y-4">
+							<label className="flex items-center justify-between cursor-pointer">
+								<span className="text-sidebar-foreground/80">Show Dots</span>
+								<input
+									type="checkbox"
+									checked={settings.showDots}
+									onChange={(e) =>
+										setSettings((s) => ({ ...s, showDots: e.target.checked }))
+									}
+									className="w-4 h-4 accent-sidebar-accent-foreground cursor-pointer"
+								/>
+							</label>
 
-			{/* Controls Panel */}
-			<div className="fixed top-16 left-5 z-[1000] bg-black/70 px-4 py-3.5 rounded-md text-xs max-w-[220px]">
-				<strong>Controls</strong>
-				<div className="mt-3 space-y-3">
-					<label className="flex items-center justify-between cursor-pointer">
-						<span>Show Dots</span>
-						<input
-							type="checkbox"
-							checked={settings.showDots}
-							onChange={(e) =>
-								setSettings((s) => ({ ...s, showDots: e.target.checked }))
-							}
-							className="w-4 h-4 accent-white cursor-pointer"
-						/>
-					</label>
+							<label className="flex items-center justify-between cursor-pointer">
+								<span className="text-sidebar-foreground/80">Show Lines</span>
+								<input
+									type="checkbox"
+									checked={settings.showLines}
+									onChange={(e) =>
+										setSettings((s) => ({ ...s, showLines: e.target.checked }))
+									}
+									className="w-4 h-4 accent-sidebar-accent-foreground cursor-pointer"
+								/>
+							</label>
 
-					<label className="flex items-center justify-between cursor-pointer">
-						<span>Show Lines</span>
-						<input
-							type="checkbox"
-							checked={settings.showLines}
-							onChange={(e) =>
-								setSettings((s) => ({ ...s, showLines: e.target.checked }))
-							}
-							className="w-4 h-4 accent-white cursor-pointer"
-						/>
-					</label>
+							<div className="space-y-2">
+								<div className="flex justify-between text-sidebar-foreground/80">
+									<span>Distance</span>
+									<span>{settings.minDistance}</span>
+								</div>
+								<input
+									type="range"
+									min="10"
+									max="300"
+									value={settings.minDistance}
+									onChange={(e) =>
+										setSettings((s) => ({
+											...s,
+											minDistance: Number(e.target.value),
+										}))
+									}
+									className="w-full h-1 bg-sidebar-border rounded-full appearance-none cursor-pointer [&::-webkit-slider-thumb]:appearance-none [&::-webkit-slider-thumb]:w-2.5 [&::-webkit-slider-thumb]:h-2.5 [&::-webkit-slider-thumb]:bg-sidebar-foreground [&::-webkit-slider-thumb]:rounded-full hover:[&::-webkit-slider-thumb]:bg-sidebar-accent-foreground"
+								/>
+							</div>
 
-					<div className="space-y-1">
-						<div className="flex justify-between">
-							<span>Distance</span>
-							<span>{settings.minDistance}</span>
+							<label className="flex items-center justify-between cursor-pointer">
+								<span className="text-sidebar-foreground/80">
+									Limit Connections
+								</span>
+								<input
+									type="checkbox"
+									checked={settings.limitConnections}
+									onChange={(e) =>
+										setSettings((s) => ({
+											...s,
+											limitConnections: e.target.checked,
+										}))
+									}
+									className="w-4 h-4 accent-sidebar-accent-foreground cursor-pointer"
+								/>
+							</label>
+
+							<div className="space-y-2">
+								<div className="flex justify-between text-sidebar-foreground/80">
+									<span>Max Conn.</span>
+									<span>{settings.maxConnections}</span>
+								</div>
+								<input
+									type="range"
+									min="0"
+									max="30"
+									step="1"
+									value={settings.maxConnections}
+									onChange={(e) =>
+										setSettings((s) => ({
+											...s,
+											maxConnections: Number(e.target.value),
+										}))
+									}
+									disabled={!settings.limitConnections}
+									className="w-full h-1 bg-sidebar-border rounded-full appearance-none cursor-pointer disabled:opacity-30 [&::-webkit-slider-thumb]:appearance-none [&::-webkit-slider-thumb]:w-2.5 [&::-webkit-slider-thumb]:h-2.5 [&::-webkit-slider-thumb]:bg-sidebar-foreground [&::-webkit-slider-thumb]:rounded-full hover:[&::-webkit-slider-thumb]:bg-sidebar-accent-foreground"
+								/>
+							</div>
+
+							<div className="space-y-2">
+								<div className="flex justify-between text-sidebar-foreground/80">
+									<span>Particles</span>
+									<span>{settings.particleCount}</span>
+								</div>
+								<input
+									type="range"
+									min="0"
+									max="1000"
+									step="1"
+									value={settings.particleCount}
+									onChange={(e) =>
+										setSettings((s) => ({
+											...s,
+											particleCount: Number(e.target.value),
+										}))
+									}
+									className="w-full h-1 bg-sidebar-border rounded-full appearance-none cursor-pointer [&::-webkit-slider-thumb]:appearance-none [&::-webkit-slider-thumb]:w-2.5 [&::-webkit-slider-thumb]:h-2.5 [&::-webkit-slider-thumb]:bg-sidebar-foreground [&::-webkit-slider-thumb]:rounded-full hover:[&::-webkit-slider-thumb]:bg-sidebar-accent-foreground"
+								/>
+							</div>
 						</div>
-						<input
-							type="range"
-							min="10"
-							max="300"
-							value={settings.minDistance}
-							onChange={(e) =>
-								setSettings((s) => ({
-									...s,
-									minDistance: Number(e.target.value),
-								}))
-							}
-							className="w-full h-1 bg-white/20 rounded-full appearance-none cursor-pointer [&::-webkit-slider-thumb]:appearance-none [&::-webkit-slider-thumb]:w-2.5 [&::-webkit-slider-thumb]:h-2.5 [&::-webkit-slider-thumb]:bg-white [&::-webkit-slider-thumb]:rounded-full [&::-webkit-slider-thumb]:cursor-pointer"
-						/>
-					</div>
-
-					<label className="flex items-center justify-between cursor-pointer">
-						<span>Limit Connections</span>
-						<input
-							type="checkbox"
-							checked={settings.limitConnections}
-							onChange={(e) =>
-								setSettings((s) => ({
-									...s,
-									limitConnections: e.target.checked,
-								}))
-							}
-							className="w-4 h-4 accent-white cursor-pointer"
-						/>
-					</label>
-
-					<div className="space-y-1">
-						<div className="flex justify-between">
-							<span>Max Connections</span>
-							<span>{settings.maxConnections}</span>
-						</div>
-						<input
-							type="range"
-							min="0"
-							max="30"
-							step="1"
-							value={settings.maxConnections}
-							onChange={(e) =>
-								setSettings((s) => ({
-									...s,
-									maxConnections: Number(e.target.value),
-								}))
-							}
-							disabled={!settings.limitConnections}
-							className="w-full h-1 bg-white/20 rounded-full appearance-none cursor-pointer disabled:opacity-30 [&::-webkit-slider-thumb]:appearance-none [&::-webkit-slider-thumb]:w-2.5 [&::-webkit-slider-thumb]:h-2.5 [&::-webkit-slider-thumb]:bg-white [&::-webkit-slider-thumb]:rounded-full [&::-webkit-slider-thumb]:cursor-pointer"
-						/>
-					</div>
-
-					<div className="space-y-1">
-						<div className="flex justify-between">
-							<span>Particles</span>
-							<span>{settings.particleCount}</span>
-						</div>
-						<input
-							type="range"
-							min="0"
-							max="1000"
-							step="1"
-							value={settings.particleCount}
-							onChange={(e) =>
-								setSettings((s) => ({
-									...s,
-									particleCount: Number(e.target.value),
-								}))
-							}
-							className="w-full h-1 bg-white/20 rounded-full appearance-none cursor-pointer [&::-webkit-slider-thumb]:appearance-none [&::-webkit-slider-thumb]:w-2.5 [&::-webkit-slider-thumb]:h-2.5 [&::-webkit-slider-thumb]:bg-white [&::-webkit-slider-thumb]:rounded-full [&::-webkit-slider-thumb]:cursor-pointer"
-						/>
-					</div>
-				</div>
-			</div>
+					</div>,
+					portalTarget,
+				)}
 		</>
 	);
 }

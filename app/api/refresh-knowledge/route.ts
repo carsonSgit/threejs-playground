@@ -11,8 +11,7 @@ export async function POST() {
 		);
 	}
 
-	// Knowledge refresh happens automatically when you redeploy the agent.
-	// This button provides a reminder and link to the dashboard.
+	// This endpoint is a reminder that knowledge refresh happens on redeployment.
 	return NextResponse.json({
 		success: true,
 		message:
