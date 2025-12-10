@@ -2,15 +2,33 @@ import { Conversation, Autonomous, z } from "@botpress/runtime";
 import playgroundDocs from "../knowledge/playground-docs";
 import listExamplesAction from "../actions/list-examples";
 import getExampleDetailsAction from "../actions/get-example-details";
-import generateCodeSnippetAction from "../actions/generate-code-snippet";
+
+interface MessagePayload {
+	type: string;
+	payload?: {
+		text?: string;
+	};
+}
+
+interface HandlerParams {
+	message: MessagePayload;
+	execute: (params: {
+		instructions: string;
+		knowledge: unknown[];
+		tools: Autonomous.Tool[];
+	}) => Promise<void>;
+	state: {
+		lastExampleViewed?: string;
+	};
+}
 
 export default new Conversation({
 	channel: "*",
 	state: z.object({
 		lastExampleViewed: z.string().optional(),
 	}),
-	async handler({ message, execute, state }: any) {
-		if ((message as any)?.type !== "text") {
+	async handler({ message, execute, state }: HandlerParams) {
+		if (message?.type !== "text") {
 			return;
 		}
 
@@ -39,9 +57,7 @@ export default new Conversation({
 				count: z.number(),
 			}),
 			handler: async (input: { category?: string; tag?: string }) => {
-				return await (listExamplesAction.handler as any)({
-					input: input as any,
-				});
+				return await listExamplesAction.handler({ input } as unknown as Parameters<typeof listExamplesAction.handler>[0]);
 			},
 		});
 
@@ -74,72 +90,31 @@ export default new Conversation({
 				found: z.boolean(),
 			}),
 			handler: async (input: { slug: string }) => {
-				const result = await (getExampleDetailsAction.handler as any)({
-					input: input as any,
-				});
+				const result = await getExampleDetailsAction.handler({ input } as unknown as Parameters<typeof getExampleDetailsAction.handler>[0]);
 				if (result.found && result.example && state) {
-					(state as any).lastExampleViewed = input.slug;
+					state.lastExampleViewed = input.slug;
 				}
 				return result;
 			},
 		});
 
-		const generateCodeSnippetTool = new Autonomous.Tool({
-			name: "generate_code_snippet",
-			description:
-				"Generate a working code snippet or working example code for Three.js concepts. Use this when the user asks for code examples, wants to see how to implement something, or needs help with Three.js programming.",
-			input: z.object({
-				concept: z
-					.string()
-					.describe("The Three.js concept or feature to generate code for"),
-				exampleSlug: z
-					.string()
-					.optional()
-					.describe("Optional: base the snippet on a specific example"),
-				complexity: z
-					.enum(["simple", "intermediate", "advanced"])
-					.optional()
-					.describe("Desired complexity level"),
-			}),
-			output: z.object({
-				code: z.string(),
-				language: z.string(),
-				explanation: z.string(),
-			}),
-			handler: async (input: {
-				concept: string;
-				exampleSlug?: string;
-				complexity?: "simple" | "intermediate" | "advanced";
-			}) => {
-				return await (generateCodeSnippetAction.handler as any)({
-					input: input as any,
-				});
-			},
-		});
 
-		await (execute as any)({
-			instructions: `You are a helpful AI assistant for the Three.js Playground project. Your role is to:
-			1. **Help users explore examples**: Guide users through the available Three.js examples, explain what each one does, and help them understand the code and concepts.
-			2. **Answer technical questions**: Use the playground documentation to answer questions about Three.js, WebGL, shaders, effects, and the specific implementations in the playground.
-			3. **Provide code assistance**: Help users understand code patterns, generate snippets, and explain Three.js concepts based on the playground examples.
-			4. **Be conversational and helpful**: Keep responses concise but informative. Use the tools available to fetch real information about examples rather than making things up.
-			
-			## Available Examples:
-			- **ascii-earth**: Rotating Earth rendered with ASCII characters
-			- **boiling-star**: Procedural star with shaders and particle effects
-			- **particle-network**: Dynamic particle system with connection lines
 
-			## Guidelines:
-			- When users ask about examples, use the list_examples tool first
-			- When they ask about a specific example, use get_example_details tool
-			- When they need code help, use generate_code_snippet tool
-			- Always reference the documentation when explaining concepts
-			- Be encouraging and help users learn Three.js concepts
-			- If asked about something not in the documentation, politely redirect to Three.js Playground topics
+		await execute({
+			instructions: `You are a Three.js Playground assistant. Help users explore examples and generate Three.js code.
 
-			The user said: "${(message as any)?.payload?.text || ""}"`,
+Tools:
+- list_examples: Browse available examples
+- get_example_details: Get details about a specific example
+
+When generating code, create complete runnable examples with:
+- import * as THREE from "three"
+- Scene, camera, renderer, geometry, material, animation loop
+- Window resize handling
+
+The user said: "${message?.payload?.text || ""}"`,
 			knowledge: [playgroundDocs],
-			tools: [listExamplesTool, getExampleDetailsTool, generateCodeSnippetTool],
+			tools: [listExamplesTool, getExampleDetailsTool],
 		});
 	},
 });
