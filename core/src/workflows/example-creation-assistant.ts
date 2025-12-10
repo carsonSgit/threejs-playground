@@ -1,4 +1,5 @@
 import { Workflow, z } from "@botpress/runtime";
+import generateThreejsCodeAction from "../actions/generate-threejs-code";
 import listExamplesAction from "../actions/list-examples";
 
 export default new Workflow({
@@ -7,51 +8,57 @@ export default new Workflow({
 		userRequest: z
 			.string()
 			.describe("The user's request for creating a new example"),
-		concept: z
-			.string()
-			.optional()
-			.describe("The Three.js concept they want to implement"),
+		concept: z.string().describe("The Three.js concept they want to implement"),
 		complexity: z
 			.enum(["beginner", "intermediate", "advanced"])
 			.optional()
-			.describe("Desired complexity level"),
+			.default("beginner"),
+		additionalRequirements: z.string().optional(),
+		userId: z.string().optional(),
 	}),
 	output: z.object({
 		success: z.boolean(),
-		suggestions: z.array(z.string()).optional(),
+		code: z.string().optional(),
+		title: z.string().optional(),
+		explanation: z.string().optional(),
+		sampleId: z.string().optional(),
 		message: z.string(),
 	}),
 	async handler({ input }) {
 		try {
+			const codeResult = await generateThreejsCodeAction.handler({
+				input: {
+					concept: input.concept,
+					complexity: input.complexity,
+					additionalRequirements: input.additionalRequirements,
+				},
+			} as unknown as Parameters<typeof generateThreejsCodeAction.handler>[0]);
+
+			if (!codeResult.success || !codeResult.code) {
+				return {
+					success: false,
+					message: codeResult.error || "Failed to generate code.",
+				};
+			}
+
+			const sampleId = `sample_${Date.now()}_${Math.random().toString(36).substring(7)}`;
+
 			const allExamples = await listExamplesAction.handler({
 				input: {},
 			} as unknown as Parameters<typeof listExamplesAction.handler>[0]);
 
-			const suggestions = [
-				"Review similar examples in the playground for patterns",
-				"Consider using Three.js best practices from existing examples",
-				"Ensure proper cleanup in useEffect return function",
-				"Use OrbitControls for interactive examples",
-				"Handle window resize events for responsive design",
-			];
-
-			if (input.complexity === "beginner") {
-				suggestions.push("Start with basic geometries and materials");
-				suggestions.push("Use built-in Three.js effects before custom shaders");
-			} else if (input.complexity === "advanced") {
-				suggestions.push("Consider custom shaders for unique effects");
-				suggestions.push("Use post-processing for enhanced visuals");
-			}
-
 			return {
 				success: true,
-				suggestions,
-				message: `I've prepared suggestions for creating your example. Review the ${allExamples.count} existing examples for patterns and best practices.`,
+				code: codeResult.code,
+				title: codeResult.title,
+				explanation: codeResult.explanation,
+				sampleId,
+				message: `Generated: "${codeResult.title}"\n\n${codeResult.explanation}\n\nCode ready in Code Sandbox. ${allExamples.count} examples available.`,
 			};
 		} catch (error) {
 			return {
 				success: false,
-				message: `Error preparing example creation assistance: ${error instanceof Error ? error.message : "Unknown error"}`,
+				message: error instanceof Error ? error.message : "Unknown error",
 			};
 		}
 	},

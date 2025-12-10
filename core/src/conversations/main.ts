@@ -1,4 +1,5 @@
 import { Autonomous, Conversation, z } from "@botpress/runtime";
+import generateThreejsCodeAction from "../actions/generate-threejs-code";
 import getExampleDetailsAction from "../actions/get-example-details";
 import listExamplesAction from "../actions/list-examples";
 import playgroundDocs from "../knowledge/playground-docs";
@@ -102,21 +103,75 @@ export default new Conversation({
 			},
 		});
 
+		const generateCodeTool = new Autonomous.Tool({
+			name: "generate_threejs_code",
+			description:
+				"Generate custom Three.js code samples. Use for creating visualizations, effects, or animations, be creative.",
+			input: z.object({
+				concept: z.string().describe("Three.js concept to implement"),
+				complexity: z.enum(["beginner", "intermediate", "advanced"]).optional(),
+				additionalRequirements: z.string().optional(),
+			}),
+			output: z.object({
+				success: z.boolean(),
+				code: z.string().optional(),
+				title: z.string().optional(),
+				explanation: z.string().optional(),
+				error: z.string().optional(),
+			}),
+			handler: async (input: {
+				concept: string;
+				complexity?: "beginner" | "intermediate" | "advanced";
+				additionalRequirements?: string;
+			}) => {
+				const result = await generateThreejsCodeAction.handler({
+					input,
+				} as unknown as Parameters<
+					typeof generateThreejsCodeAction.handler
+				>[0]);
+
+				if (result.success && result.code) {
+					const sampleId = `sample_${Date.now()}_${Math.random().toString(36).substring(7)}`;
+					console.log("Code generated:", {
+						sampleId,
+						title: result.title,
+						concept: input.concept,
+					});
+				}
+
+				return result;
+			},
+		});
+
 		await execute({
 			instructions: `You are a Three.js Playground assistant. Help users explore examples and generate Three.js code.
 
-Tools:
-- list_examples: Browse available examples
-- get_example_details: Get details about a specific example
+Available Tools:
+- list_examples: Browse available examples in the playground
+- get_example_details: Get detailed info about a specific example
+- generate_threejs_code: Generate custom Three.js code samples using AI (USE THIS for code generation requests!)
 
-When generating code, create complete runnable examples with:
-- import * as THREE from "three"
-- Scene, camera, renderer, geometry, material, animation loop
-- Window resize handling
+When users ask to create, generate, or build Three.js visualizations:
+1. Use the generate_threejs_code tool with creative, specific concepts
+2. AVOID generic examples like "rotating cube" - be creative and unique!
+3. Consider the user's skill level when setting complexity
+4. After generating, tell the user the code has been created and they can see it in the Code Sandbox
+
+When generating code via the tool:
+- Extract the specific concept/effect the user wants
+- Determine appropriate complexity (beginner/intermediate/advanced)
+- Include any special requirements they mentioned
+- Make it visually interesting and unique!
+
+Examples of good concepts to generate:
+- "Particle system forming a DNA helix with color gradients"
+- "Morphing icosahedron with wireframe and normal materials"
+- "Procedural terrain with vertex displacement and fog"
+- "Spiral galaxy with instanced stars and glow effects"
 
 The user said: "${message?.payload?.text || ""}"`,
 			knowledge: [playgroundDocs],
-			tools: [listExamplesTool, getExampleDetailsTool],
+			tools: [listExamplesTool, getExampleDetailsTool, generateCodeTool],
 		});
 	},
 });
