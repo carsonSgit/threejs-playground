@@ -2,7 +2,7 @@
 
 import { useUser } from "@clerk/nextjs";
 import { Code2, Play, Plus, Trash2 } from "lucide-react";
-import { useEffect, useRef, useState } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
 import type { CodeSample } from "@/app/api/code-samples/route";
 import { Button } from "@/components/ui/button";
 import { ScrollArea } from "@/components/ui/scroll-area";
@@ -18,6 +18,42 @@ export default function CodeSandboxPage() {
 	const lastSelectedSampleIdRef = useRef<string | null>(null);
 	const isFetchingRef = useRef(false);
 
+	const fetchSamples = useCallback(
+		async (preserveSelection = true) => {
+			if (isFetchingRef.current) return;
+
+			try {
+				isFetchingRef.current = true;
+				const response = await fetch("/api/code-samples");
+				const data = await response.json();
+				const fetchedSamples = data.samples || [];
+
+				setSamples(fetchedSamples);
+
+				if (fetchedSamples.length > 0) {
+					if (!selectedSample) {
+						setSelectedSample(fetchedSamples[0]);
+					} else if (preserveSelection && selectedSample) {
+						const stillExists = fetchedSamples.find(
+							(s: CodeSample) => s.id === selectedSample.id,
+						);
+						if (!stillExists) {
+							setSelectedSample(fetchedSamples[0]);
+						}
+					}
+				} else {
+					setSelectedSample(null);
+				}
+			} catch (error) {
+				console.error("Failed to fetch samples:", error);
+			} finally {
+				isFetchingRef.current = false;
+				setLoading(false);
+			}
+		},
+		[selectedSample],
+	);
+
 	useEffect(() => {
 		fetchSamples(false); // Initial load - don't preserve selection
 
@@ -31,7 +67,7 @@ export default function CodeSandboxPage() {
 		return () => {
 			window.removeEventListener("code-sample-saved", handleSampleSaved);
 		};
-	}, []);
+	}, [fetchSamples]);
 
 	useEffect(() => {
 		if (
@@ -52,40 +88,7 @@ export default function CodeSandboxPage() {
 			textareaRef.current.style.height = "auto";
 			textareaRef.current.style.height = `${textareaRef.current.scrollHeight}px`;
 		}
-	}, [code]);
-
-	const fetchSamples = async (preserveSelection = true) => {
-		if (isFetchingRef.current) return;
-
-		try {
-			isFetchingRef.current = true;
-			const response = await fetch("/api/code-samples");
-			const data = await response.json();
-			const fetchedSamples = data.samples || [];
-
-			setSamples(fetchedSamples);
-
-			if (fetchedSamples.length > 0) {
-				if (!selectedSample) {
-					setSelectedSample(fetchedSamples[0]);
-				} else if (preserveSelection && selectedSample) {
-					const stillExists = fetchedSamples.find(
-						(s: CodeSample) => s.id === selectedSample.id,
-					);
-					if (!stillExists) {
-						setSelectedSample(fetchedSamples[0]);
-					}
-				}
-			} else {
-				setSelectedSample(null);
-			}
-		} catch (error) {
-			console.error("Failed to fetch samples:", error);
-		} finally {
-			isFetchingRef.current = false;
-			setLoading(false);
-		}
-	};
+	}, []);
 
 	const handleDelete = async (sampleId: string) => {
 		try {
@@ -295,12 +298,20 @@ ${codeContent}
 								{samples.map((sample) => (
 									<div
 										key={sample.id}
-										className={`p-3 border border-border rounded cursor-pointer transition-all ${
+										role="button"
+										tabIndex={0}
+										className={`w-full p-3 border border-border rounded cursor-pointer transition-all text-left ${
 											selectedSample?.id === sample.id
 												? "bg-sidebar-accent border-foreground/40"
 												: "bg-black/40 hover:bg-black/60"
 										}`}
 										onClick={() => setSelectedSample(sample)}
+										onKeyDown={(e) => {
+											if (e.key === "Enter" || e.key === " ") {
+												e.preventDefault();
+												setSelectedSample(sample);
+											}
+										}}
 									>
 										<div className="flex items-start justify-between">
 											<div className="flex-1 min-w-0">

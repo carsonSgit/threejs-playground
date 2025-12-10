@@ -14,7 +14,7 @@ export interface CodeSample {
 
 const codeSamplesStorage = new Map<string, CodeSample[]>();
 
-export async function GET(request: NextRequest) {
+export async function GET(_request: NextRequest) {
 	try {
 		const { userId } = await auth();
 		const userKey = userId || "anonymous";
@@ -22,7 +22,7 @@ export async function GET(request: NextRequest) {
 		const samples = codeSamplesStorage.get(userKey) || [];
 
 		return NextResponse.json({ samples });
-	} catch (error) {
+	} catch (_error) {
 		return NextResponse.json(
 			{ error: "Failed to fetch code samples" },
 			{ status: 500 },
@@ -92,7 +92,7 @@ export async function POST(request: NextRequest) {
 		codeSamplesStorage.set(userKey, userSamples);
 
 		return NextResponse.json({ success: true, sample });
-	} catch (error) {
+	} catch (_error) {
 		return NextResponse.json(
 			{ error: "Failed to save code sample" },
 			{ status: 500 },
@@ -120,7 +120,7 @@ export async function DELETE(request: NextRequest) {
 		codeSamplesStorage.set(userKey, filtered);
 
 		return NextResponse.json({ success: true });
-	} catch (error) {
+	} catch (_error) {
 		return NextResponse.json(
 			{ error: "Failed to delete code sample" },
 			{ status: 500 },

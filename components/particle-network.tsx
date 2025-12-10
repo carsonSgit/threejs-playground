@@ -317,6 +317,7 @@ export default function ParticleNetwork() {
 					sidebarState === "collapsed" ? (
 						<div className="flex items-center justify-center h-full">
 							<button
+								type="button"
 								onClick={toggleSidebar}
 								className="flex items-center justify-center w-8 h-8 rounded hover:bg-sidebar-accent transition-colors text-sidebar-foreground hover:text-sidebar-accent-foreground"
 								aria-label="Open Settings"

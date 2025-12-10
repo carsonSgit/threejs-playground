@@ -198,7 +198,7 @@ export default function Home() {
 					<div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-6">
 						<div className="text-xs text-muted-foreground font-mono">
 							<p className="mb-1">
-								// built_with ❤ using three.js + typescript + next.js
+								{/* built_with ❤ using three.js + typescript + next.js */}
 							</p>
 							<p className="text-[10px] text-white/30">v0.0.1 | 2025</p>
 						</div>
