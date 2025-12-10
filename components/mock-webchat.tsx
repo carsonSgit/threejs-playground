@@ -36,25 +36,34 @@ export function MockWebchat({ onRetry, isRetrying }: MockWebchatProps) {
 			</div>
 
 			<div className="flex-1 overflow-y-auto p-2 space-y-3 cursor-default">
-				<div className="bg-yellow-400/10 border border-yellow-400/20 p-3">
+				<div className="bg-blue-400/10 border border-blue-400/20 p-3">
 					<div className="flex items-start gap-2 mb-2">
-						<AlertCircle className="h-4 w-4 text-yellow-400 mt-0.5 shrink-0" />
-						<span className="text-xs font-medium text-yellow-400">
-							Assistant Temporarily Unavailable
+						<AlertCircle className="h-4 w-4 text-blue-400 mt-0.5 shrink-0" />
+						<span className="text-xs font-medium text-blue-400">
+							AI Code Generation Ready
 						</span>
 					</div>
-					<p className="text-xs text-gray-300 leading-relaxed">
-						The AI assistant has reached its usage limit for invocations. The
-						service will be restored once the quota resets. Thank you for your
-						patience!
+					<p className="text-xs text-gray-300 leading-relaxed mb-2">
+						I can generate custom Three.js code samples for you! Just describe
+						what you want to create.
 					</p>
+					<div className="text-xs text-gray-400 space-y-1 pl-2 border-l border-blue-400/30">
+						<p>✨ Try asking:</p>
+						<p className="text-gray-300">"Create a particle spiral galaxy"</p>
+						<p className="text-gray-300">
+							"Generate a morphing icosahedron with wireframe"
+						</p>
+						<p className="text-gray-300">
+							"Make a DNA helix with glowing particles"
+						</p>
+					</div>
 				</div>
 			</div>
 
 			<div className="border-t border-white/10 p-4 space-y-2 bg-[#101010]">
 				<div className="flex gap-2">
 					<Input
-						placeholder="what kind of math do these use?"
+						placeholder="generate a spiral galaxy with particles..."
 						disabled
 						className="flex-1 h-10 bg-[#202020] border-[#2f2f2f] text-[#525355] placeholder:text-[#F0F0F0] text-sm disabled:cursor-not-allowed font-mono"
 					/>

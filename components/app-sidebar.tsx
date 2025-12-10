@@ -1,29 +1,5 @@
 "use client";
 
-import { useState, useEffect } from "react";
-import { usePathname } from "next/navigation";
-import Link from "next/link";
-import {
-	ChevronDown,
-	Bot,
-	X,
-	ArrowLeft,
-	Database,
-	RotateCcw,
-} from "lucide-react";
-import { MockWebchat } from "@/components/mock-webchat";
-import {
-	Sidebar,
-	SidebarContent,
-	SidebarFooter,
-	SidebarGroup,
-	SidebarMenu,
-	SidebarMenuItem,
-	SidebarMenuButton,
-	SidebarSeparator,
-	useSidebar,
-} from "@/components/ui/sidebar";
-import { Button } from "@/components/ui/button";
 import {
 	SignedIn,
 	SignedOut,
@@ -32,6 +8,32 @@ import {
 	UserButton,
 	useUser,
 } from "@clerk/nextjs";
+import {
+	ArrowLeft,
+	Bot,
+	ChevronDown,
+	Code2,
+	Database,
+	LayoutDashboard,
+	RotateCcw,
+	X,
+} from "lucide-react";
+import Link from "next/link";
+import { usePathname } from "next/navigation";
+import { useEffect, useState } from "react";
+import { MockWebchat } from "@/components/mock-webchat";
+import { Button } from "@/components/ui/button";
+import {
+	Sidebar,
+	SidebarContent,
+	SidebarFooter,
+	SidebarGroup,
+	SidebarMenu,
+	SidebarMenuButton,
+	SidebarMenuItem,
+	SidebarSeparator,
+	useSidebar,
+} from "@/components/ui/sidebar";
 
 declare global {
 	interface Window {
@@ -67,14 +69,9 @@ function SidebarInner({
 		setBotpressStatus("loading");
 		setHasQuotaError(false);
 
-		// Give Botpress a moment to reinitialize
 		setTimeout(() => {
-			if (window.botpress) {
-				setBotpressStatus("ready");
-			} else {
-				setBotpressStatus("error");
-				setHasQuotaError(true);
-			}
+			setBotpressStatus(window.botpress ? "ready" : "error");
+			setHasQuotaError(!window.botpress);
 			setIsRetrying(false);
 		}, 2000);
 	};
@@ -93,7 +90,6 @@ function SidebarInner({
 			setRefreshMessage("Failed to refresh knowledge base");
 		} finally {
 			setIsRefreshingKnowledge(false);
-			// Clear message after 5 seconds
 			setTimeout(() => setRefreshMessage(null), 5000);
 		}
 	};
@@ -108,13 +104,10 @@ function SidebarInner({
 
 		const setupListeners = () => {
 			if (window.botpress) {
-				// Botpress is loaded - set ready immediately
 				setBotpressStatus("ready");
 				setHasQuotaError(false);
 
-				// Listen for errors (actual quota/runtime errors)
 				unsubscribeError = window.botpress.on("error", (data: unknown) => {
-					// Only set quota error if it's actually a quota-related error
 					const errorStr = JSON.stringify(data).toLowerCase();
 					if (errorStr.includes("quota") || errorStr.includes("limit")) {
 						setBotpressStatus("error");
@@ -127,7 +120,6 @@ function SidebarInner({
 		if (window.botpress) {
 			setupListeners();
 		} else {
-			// Poll for Botpress to load
 			checkInterval = setInterval(() => {
 				if (window.botpress) {
 					setupListeners();
@@ -135,7 +127,6 @@ function SidebarInner({
 				}
 			}, 100);
 
-			// After 10 seconds, if still not loaded, show error
 			setTimeout(() => {
 				if (checkInterval) clearInterval(checkInterval);
 				if (!window.botpress && botpressStatus === "loading") {
@@ -152,7 +143,6 @@ function SidebarInner({
 	}, [botpressStatus]);
 
 	const toggleChat = () => {
-		// Use the Botpress API to toggle the webchat
 		if (window.botpress && !hasQuotaError) {
 			window.botpress.toggle();
 		}
@@ -269,6 +259,32 @@ function SidebarInner({
 									</div>
 								)}
 							</div>
+						</SidebarMenuItem>
+
+						<SidebarMenuItem>
+							<SidebarMenuButton
+								asChild
+								tooltip="Examples"
+								className="font-mono text-xs border-0 hover:bg-sidebar-accent/30"
+							>
+								<Link href="/">
+									<LayoutDashboard className="h-4 w-4 shrink-0" />
+									<span>examples</span>
+								</Link>
+							</SidebarMenuButton>
+						</SidebarMenuItem>
+
+						<SidebarMenuItem>
+							<SidebarMenuButton
+								asChild
+								tooltip="Code Sandbox"
+								className="font-mono text-xs border-0 hover:bg-sidebar-accent/30"
+							>
+								<Link href="/code-sandbox">
+									<Code2 className="h-4 w-4 shrink-0" />
+									<span>code_sandbox</span>
+								</Link>
+							</SidebarMenuButton>
 						</SidebarMenuItem>
 					</SidebarMenu>
 				</SidebarGroup>

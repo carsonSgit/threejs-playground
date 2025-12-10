@@ -7,11 +7,11 @@
  * Very cool use of buffergeometry drawrange to create a particle network effect!
  */
 
+import { Settings } from "lucide-react";
 import { useEffect, useRef, useState } from "react";
 import { createPortal } from "react-dom";
 import * as THREE from "three";
 import { OrbitControls } from "three/addons/controls/OrbitControls.js";
-import { Settings } from "lucide-react";
 import { useSidebar } from "@/components/ui/sidebar";
 
 interface EffectSettings {
@@ -317,6 +317,7 @@ export default function ParticleNetwork() {
 					sidebarState === "collapsed" ? (
 						<div className="flex items-center justify-center h-full">
 							<button
+								type="button"
 								onClick={toggleSidebar}
 								className="flex items-center justify-center w-8 h-8 rounded hover:bg-sidebar-accent transition-colors text-sidebar-foreground hover:text-sidebar-accent-foreground"
 								aria-label="Open Settings"

@@ -72,7 +72,7 @@ export default function AsciiEarth() {
 			}
 
 			ctx.putImageData(imgData, 0, 0);
-			earthTexture.image = canvas as any;
+			earthTexture.image = canvas as unknown as HTMLImageElement;
 			earthTexture.needsUpdate = true;
 		};
 
