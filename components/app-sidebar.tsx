@@ -1,31 +1,5 @@
 "use client";
 
-import { useState, useEffect } from "react";
-import { usePathname } from "next/navigation";
-import Link from "next/link";
-import {
-	ChevronDown,
-	Bot,
-	X,
-	ArrowLeft,
-	Database,
-	RotateCcw,
-	Code2,
-	LayoutDashboard,
-} from "lucide-react";
-import { MockWebchat } from "@/components/mock-webchat";
-import {
-	Sidebar,
-	SidebarContent,
-	SidebarFooter,
-	SidebarGroup,
-	SidebarMenu,
-	SidebarMenuItem,
-	SidebarMenuButton,
-	SidebarSeparator,
-	useSidebar,
-} from "@/components/ui/sidebar";
-import { Button } from "@/components/ui/button";
 import {
 	SignedIn,
 	SignedOut,
@@ -34,6 +8,32 @@ import {
 	UserButton,
 	useUser,
 } from "@clerk/nextjs";
+import {
+	ArrowLeft,
+	Bot,
+	ChevronDown,
+	Code2,
+	Database,
+	LayoutDashboard,
+	RotateCcw,
+	X,
+} from "lucide-react";
+import Link from "next/link";
+import { usePathname } from "next/navigation";
+import { useEffect, useState } from "react";
+import { MockWebchat } from "@/components/mock-webchat";
+import { Button } from "@/components/ui/button";
+import {
+	Sidebar,
+	SidebarContent,
+	SidebarFooter,
+	SidebarGroup,
+	SidebarMenu,
+	SidebarMenuButton,
+	SidebarMenuItem,
+	SidebarSeparator,
+	useSidebar,
+} from "@/components/ui/sidebar";
 
 declare global {
 	interface Window {
@@ -81,7 +81,9 @@ function SidebarInner({
 		setRefreshMessage(null);
 
 		try {
-			const response = await fetch("/api/refresh-knowledge", { method: "POST" });
+			const response = await fetch("/api/refresh-knowledge", {
+				method: "POST",
+			});
 			const data = await response.json();
 			setRefreshMessage(data.message);
 		} catch {

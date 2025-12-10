@@ -1,5 +1,5 @@
-import { NextRequest, NextResponse } from "next/server";
 import { auth } from "@clerk/nextjs/server";
+import { type NextRequest, NextResponse } from "next/server";
 
 export interface CodeSample {
 	id: string;
@@ -34,8 +34,16 @@ export async function POST(request: NextRequest) {
 	try {
 		const { userId: authUserId } = await auth();
 		const body = await request.json();
-		const { title, code, language, concept, explanation, sampleId, userId: bodyUserId } = body;
-		
+		const {
+			title,
+			code,
+			language,
+			concept,
+			explanation,
+			sampleId,
+			userId: bodyUserId,
+		} = body;
+
 		const userKey = authUserId || bodyUserId || "anonymous";
 
 		if (!code || !language) {
@@ -46,7 +54,9 @@ export async function POST(request: NextRequest) {
 		}
 
 		const userSamples = codeSamplesStorage.get(userKey) || [];
-		const existingIndex = sampleId ? userSamples.findIndex((s) => s.id === sampleId) : -1;
+		const existingIndex = sampleId
+			? userSamples.findIndex((s) => s.id === sampleId)
+			: -1;
 
 		let sample: CodeSample;
 		if (existingIndex >= 0) {
@@ -55,13 +65,19 @@ export async function POST(request: NextRequest) {
 				title: title || userSamples[existingIndex].title,
 				code,
 				language,
-				concept: concept !== undefined ? concept : userSamples[existingIndex].concept,
-				explanation: explanation !== undefined ? explanation : userSamples[existingIndex].explanation,
+				concept:
+					concept !== undefined ? concept : userSamples[existingIndex].concept,
+				explanation:
+					explanation !== undefined
+						? explanation
+						: userSamples[existingIndex].explanation,
 			};
 			userSamples[existingIndex] = sample;
 		} else {
 			sample = {
-				id: sampleId || `sample_${Date.now()}_${Math.random().toString(36).substring(7)}`,
+				id:
+					sampleId ||
+					`sample_${Date.now()}_${Math.random().toString(36).substring(7)}`,
 				title: title || `Code Sample: ${concept || "Untitled"}`,
 				code,
 				language,
@@ -72,7 +88,7 @@ export async function POST(request: NextRequest) {
 			};
 			userSamples.push(sample);
 		}
-		
+
 		codeSamplesStorage.set(userKey, userSamples);
 
 		return NextResponse.json({ success: true, sample });
@@ -111,4 +127,3 @@ export async function DELETE(request: NextRequest) {
 		);
 	}
 }
-

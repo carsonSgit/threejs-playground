@@ -1,4 +1,4 @@
-import { z, defineConfig } from "@botpress/runtime";
+import { defineConfig, z } from "@botpress/runtime";
 
 export default defineConfig({
 	name: "core",
@@ -23,7 +23,9 @@ export default defineConfig({
 			favoriteExamples: z.array(z.string()).optional(),
 			preferences: z
 				.object({
-					complexityLevel: z.enum(["beginner", "intermediate", "advanced"]).optional(),
+					complexityLevel: z
+						.enum(["beginner", "intermediate", "advanced"])
+						.optional(),
 					preferredCategory: z.string().optional(),
 				})
 				.optional(),

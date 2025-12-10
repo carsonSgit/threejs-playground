@@ -7,11 +7,11 @@
  * Very cool use of buffergeometry drawrange to create a particle network effect!
  */
 
+import { Settings } from "lucide-react";
 import { useEffect, useRef, useState } from "react";
 import { createPortal } from "react-dom";
 import * as THREE from "three";
 import { OrbitControls } from "three/addons/controls/OrbitControls.js";
-import { Settings } from "lucide-react";
 import { useSidebar } from "@/components/ui/sidebar";
 
 interface EffectSettings {

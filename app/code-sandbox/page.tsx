@@ -1,11 +1,11 @@
 "use client";
 
-import { useState, useEffect, useRef } from "react";
 import { useUser } from "@clerk/nextjs";
-import { Trash2, Play, Code2, Plus } from "lucide-react";
+import { Code2, Play, Plus, Trash2 } from "lucide-react";
+import { useEffect, useRef, useState } from "react";
+import type { CodeSample } from "@/app/api/code-samples/route";
 import { Button } from "@/components/ui/button";
 import { ScrollArea } from "@/components/ui/scroll-area";
-import type { CodeSample } from "@/app/api/code-samples/route";
 
 export default function CodeSandboxPage() {
 	const { user } = useUser();
@@ -20,21 +20,24 @@ export default function CodeSandboxPage() {
 
 	useEffect(() => {
 		fetchSamples(false); // Initial load - don't preserve selection
-		
+
 		// Listen for code sample saved events
 		const handleSampleSaved = () => {
 			setTimeout(() => fetchSamples(true), 500); // Small delay to ensure API has processed
 		};
-		
+
 		window.addEventListener("code-sample-saved", handleSampleSaved);
-		
+
 		return () => {
 			window.removeEventListener("code-sample-saved", handleSampleSaved);
 		};
 	}, []);
 
 	useEffect(() => {
-		if (selectedSample && lastSelectedSampleIdRef.current !== selectedSample.id) {
+		if (
+			selectedSample &&
+			lastSelectedSampleIdRef.current !== selectedSample.id
+		) {
 			setCode(selectedSample.code);
 			lastSelectedSampleIdRef.current = selectedSample.id;
 		} else if (!selectedSample) {
@@ -59,14 +62,16 @@ export default function CodeSandboxPage() {
 			const response = await fetch("/api/code-samples");
 			const data = await response.json();
 			const fetchedSamples = data.samples || [];
-			
+
 			setSamples(fetchedSamples);
-			
+
 			if (fetchedSamples.length > 0) {
 				if (!selectedSample) {
 					setSelectedSample(fetchedSamples[0]);
 				} else if (preserveSelection && selectedSample) {
-					const stillExists = fetchedSamples.find((s: CodeSample) => s.id === selectedSample.id);
+					const stillExists = fetchedSamples.find(
+						(s: CodeSample) => s.id === selectedSample.id,
+					);
 					if (!stillExists) {
 						setSelectedSample(fetchedSamples[0]);
 					}
@@ -158,7 +163,7 @@ window.addEventListener('resize', () => {
 	const handleNewSample = async (e?: React.MouseEvent) => {
 		e?.preventDefault();
 		e?.stopPropagation();
-		
+
 		const newSample: CodeSample = {
 			id: `sample_${Date.now()}_${Math.random().toString(36).substring(7)}`,
 			title: "New Code Sample",
@@ -236,37 +241,37 @@ ${codeContent}
 								run and modify your code samples
 							</p>
 						</div>
-					<div className="flex items-center gap-2 flex-shrink-0 ml-auto">
-						<Button
-							onClick={(e) => handleNewSample(e)}
-							type="button"
-							variant="outline"
-							size="sm"
-							className="font-mono text-xs"
-						>
-							<Plus className="h-3 w-3 mr-2" />
-							new
-						</Button>
-						<Button
-							onClick={handleRun}
-							variant="outline"
-							size="sm"
-							className="font-mono text-xs"
-							disabled={!selectedSample}
-						>
-							<Play className="h-3 w-3 mr-2" />
-							run
-						</Button>
-						<Button
-							onClick={handleSave}
-							variant="outline"
-							size="sm"
-							className="font-mono text-xs"
-							disabled={!selectedSample}
-						>
-							save
-						</Button>
-					</div>
+						<div className="flex items-center gap-2 flex-shrink-0 ml-auto">
+							<Button
+								onClick={(e) => handleNewSample(e)}
+								type="button"
+								variant="outline"
+								size="sm"
+								className="font-mono text-xs"
+							>
+								<Plus className="h-3 w-3 mr-2" />
+								new
+							</Button>
+							<Button
+								onClick={handleRun}
+								variant="outline"
+								size="sm"
+								className="font-mono text-xs"
+								disabled={!selectedSample}
+							>
+								<Play className="h-3 w-3 mr-2" />
+								run
+							</Button>
+							<Button
+								onClick={handleSave}
+								variant="outline"
+								size="sm"
+								className="font-mono text-xs"
+								disabled={!selectedSample}
+							>
+								save
+							</Button>
+						</div>
 					</div>
 				</div>
 			</header>
@@ -355,7 +360,7 @@ ${codeContent}
 											style={{
 												overflow: "hidden",
 												overflowY: "hidden",
-												overflowX: "hidden"
+												overflowX: "hidden",
 											}}
 											placeholder="// Your code here..."
 											spellCheck={false}
@@ -384,8 +389,8 @@ ${codeContent}
 									no sample selected
 								</p>
 								<p className="text-xs text-muted-foreground font-mono mt-2">
-									select a sample from the sidebar or ask the assistant to create
-									one
+									select a sample from the sidebar or ask the assistant to
+									create one
 								</p>
 							</div>
 						</div>
@@ -395,4 +400,3 @@ ${codeContent}
 		</div>
 	);
 }
-

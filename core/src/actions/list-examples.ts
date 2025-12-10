@@ -43,7 +43,10 @@ export default new Action({
 	name: "listExamples",
 	description: "List all available Three.js playground examples",
 	input: z.object({
-		category: z.string().optional().describe("Filter by category (effects, shaders, particles)"),
+		category: z
+			.string()
+			.optional()
+			.describe("Filter by category (effects, shaders, particles)"),
 		tag: z.string().optional().describe("Filter by tag"),
 	}),
 	output: z.object({
@@ -80,4 +83,3 @@ export default new Action({
 		};
 	},
 });
-

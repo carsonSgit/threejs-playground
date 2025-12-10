@@ -1,7 +1,7 @@
-import { Conversation, Autonomous, z } from "@botpress/runtime";
-import playgroundDocs from "../knowledge/playground-docs";
-import listExamplesAction from "../actions/list-examples";
+import { Autonomous, Conversation, z } from "@botpress/runtime";
 import getExampleDetailsAction from "../actions/get-example-details";
+import listExamplesAction from "../actions/list-examples";
+import playgroundDocs from "../knowledge/playground-docs";
 
 interface MessagePayload {
 	type: string;
@@ -57,7 +57,9 @@ export default new Conversation({
 				count: z.number(),
 			}),
 			handler: async (input: { category?: string; tag?: string }) => {
-				return await listExamplesAction.handler({ input } as unknown as Parameters<typeof listExamplesAction.handler>[0]);
+				return await listExamplesAction.handler({
+					input,
+				} as unknown as Parameters<typeof listExamplesAction.handler>[0]);
 			},
 		});
 
@@ -90,15 +92,15 @@ export default new Conversation({
 				found: z.boolean(),
 			}),
 			handler: async (input: { slug: string }) => {
-				const result = await getExampleDetailsAction.handler({ input } as unknown as Parameters<typeof getExampleDetailsAction.handler>[0]);
+				const result = await getExampleDetailsAction.handler({
+					input,
+				} as unknown as Parameters<typeof getExampleDetailsAction.handler>[0]);
 				if (result.found && result.example && state) {
 					state.lastExampleViewed = input.slug;
 				}
 				return result;
 			},
 		});
-
-
 
 		await execute({
 			instructions: `You are a Three.js Playground assistant. Help users explore examples and generate Three.js code.

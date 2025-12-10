@@ -1,4 +1,4 @@
-import { Knowledge, DataSource } from "@botpress/runtime";
+import { DataSource, Knowledge } from "@botpress/runtime";
 
 export default new Knowledge({
 	name: "playground-docs",

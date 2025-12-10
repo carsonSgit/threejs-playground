@@ -1,10 +1,10 @@
 "use client";
 
+import { AppSidebar } from "@/components/app-sidebar";
 import {
 	SidebarProvider as ShadcnSidebarProvider,
 	SidebarTrigger,
 } from "@/components/ui/sidebar";
-import { AppSidebar } from "@/components/app-sidebar";
 
 export function SidebarWrapper({ children }: { children: React.ReactNode }) {
 	return (

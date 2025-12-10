@@ -87,9 +87,14 @@ const EXAMPLE_DETAILS: Record<
 
 export default new Action({
 	name: "getExampleDetails",
-	description: "Get detailed information about a specific Three.js playground example",
+	description:
+		"Get detailed information about a specific Three.js playground example",
 	input: z.object({
-		slug: z.string().describe("The slug of the example (e.g., 'ascii-earth', 'boiling-star')"),
+		slug: z
+			.string()
+			.describe(
+				"The slug of the example (e.g., 'ascii-earth', 'boiling-star')",
+			),
 	}),
 	output: z.object({
 		example: z
@@ -124,4 +129,3 @@ export default new Action({
 		};
 	},
 });
-
