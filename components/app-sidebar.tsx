@@ -11,6 +11,7 @@ import {
 	Database,
 	RotateCcw,
 	Code2,
+	LayoutDashboard,
 } from "lucide-react";
 import { MockWebchat } from "@/components/mock-webchat";
 import {
@@ -256,6 +257,19 @@ function SidebarInner({
 									</div>
 								)}
 							</div>
+						</SidebarMenuItem>
+
+						<SidebarMenuItem>
+							<SidebarMenuButton
+								asChild
+								tooltip="Examples"
+								className="font-mono text-xs border-0 hover:bg-sidebar-accent/30"
+							>
+								<Link href="/">
+									<LayoutDashboard className="h-4 w-4 shrink-0" />
+									<span>examples</span>
+								</Link>
+							</SidebarMenuButton>
 						</SidebarMenuItem>
 
 						<SidebarMenuItem>
