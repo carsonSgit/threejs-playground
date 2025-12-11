@@ -1,10 +1,11 @@
 "use client";
 
 import { useUser } from "@clerk/nextjs";
-import { Code2, Play, Plus, Trash2 } from "lucide-react";
+import { Code2, Pencil, Play, Plus, Trash2 } from "lucide-react";
 import { useCallback, useEffect, useRef, useState } from "react";
 import type { CodeSample } from "@/app/api/code-samples/route";
 import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
 import { ScrollArea } from "@/components/ui/scroll-area";
 
 export default function CodeSandboxPage() {
@@ -14,6 +15,8 @@ export default function CodeSandboxPage() {
 	const [loading, setLoading] = useState(true);
 	const [code, setCode] = useState("");
 	const [iframeKey, setIframeKey] = useState(0);
+	const [editingId, setEditingId] = useState<string | null>(null);
+	const [editTitle, setEditTitle] = useState("");
 	const textareaRef = useRef<HTMLTextAreaElement>(null);
 	const lastSelectedSampleIdRef = useRef<string | null>(null);
 	const isFetchingRef = useRef(false);
@@ -86,6 +89,7 @@ export default function CodeSandboxPage() {
 		}
 	}, [selectedSample]);
 
+	// biome-ignore lint/correctness/useExhaustiveDependencies: code is required for the effect to run on content change, even if not read directly
 	useEffect(() => {
 		// Auto-resize textarea when code changes
 		if (textareaRef.current) {
@@ -93,6 +97,53 @@ export default function CodeSandboxPage() {
 			textareaRef.current.style.height = `${textareaRef.current.scrollHeight}px`;
 		}
 	}, [code]);
+
+	const startEditing = (sample: CodeSample) => {
+		setEditingId(sample.id);
+		setEditTitle(sample.title);
+	};
+
+	const handleRename = async () => {
+		if (!editingId) return;
+
+		const currentEditingId = editingId;
+		const currentEditTitle = editTitle.trim();
+
+		// Optimistically update UI
+		setEditingId(null);
+
+		if (!currentEditTitle) return;
+
+		const sample = samples.find((s) => s.id === currentEditingId);
+		if (!sample || sample.title === currentEditTitle) return;
+
+		const updatedSample = { ...sample, title: currentEditTitle };
+		setSamples(
+			samples.map((s) => (s.id === currentEditingId ? updatedSample : s)),
+		);
+		if (selectedSample?.id === currentEditingId) {
+			setSelectedSample(updatedSample);
+		}
+
+		try {
+			await fetch("/api/code-samples", {
+				method: "POST",
+				headers: { "Content-Type": "application/json" },
+				body: JSON.stringify({
+					...sample,
+					title: currentEditTitle,
+					sampleId: sample.id,
+				}),
+			});
+		} catch (error) {
+			console.error("Failed to rename sample:", error);
+			// Revert on error
+			setSamples(samples.map((s) => (s.id === currentEditingId ? sample : s)));
+			if (selectedSample?.id === currentEditingId) {
+				setSelectedSample(sample);
+			}
+		}
+	};
 
 	const handleDelete = async (sampleId: string) => {
 		try {
@@ -298,16 +349,16 @@ ${codeContent}
 								ask the assistant to create one!
 							</div>
 						) : (
-							<div className="space-y-2">
+							<div className="space-y-1">
 								{samples.map((sample) => (
 									<div
 										key={sample.id}
 										role="button"
 										tabIndex={0}
-										className={`w-full p-3 border border-border cursor-pointer transition-all text-left ${
+										className={`w-full p-2 cursor-pointer transition-all text-left group ${
 											selectedSample?.id === sample.id
-												? "bg-sidebar-accent border-foreground/40"
-												: "bg-black/40 hover:bg-black/60"
+												? "bg-sidebar-accent text-sidebar-accent-foreground"
+												: "hover:bg-sidebar-accent/30 text-sidebar-foreground"
 										}`}
 										onClick={() => setSelectedSample(sample)}
 										onKeyDown={(e) => {
@@ -318,25 +369,55 @@ ${codeContent}
 										}}
 									>
 										<div className="flex items-start justify-between">
-											<div className="flex-1 min-w-0">
-												<h3 className="text-xs font-semibold font-mono truncate">
-													{sample.title}
-												</h3>
-												<p className="text-[10px] text-muted-foreground font-mono mt-1 truncate">
-													{sample.concept}
-												</p>
+											{editingId === sample.id ? (
+												<div className="flex-1 min-w-0 mr-2">
+													<Input
+														value={editTitle}
+														onChange={(e) => setEditTitle(e.target.value)}
+														onKeyDown={(e) => {
+															if (e.key === "Enter") handleRename();
+															if (e.key === "Escape") setEditingId(null);
+														}}
+														onClick={(e) => e.stopPropagation()}
+														className="h-6 text-xs font-mono py-0 px-1 bg-transparent border-b border-foreground/20 rounded-none focus-visible:ring-0 focus-visible:border-foreground"
+														autoFocus
+														onBlur={handleRename}
+													/>
+												</div>
+											) : (
+												<div className="flex-1 min-w-0">
+													<h3 className="text-xs font-semibold font-mono truncate">
+														{sample.title}
+													</h3>
+													<p className="text-[10px] opacity-70 font-mono mt-1 truncate">
+														{sample.concept}
+													</p>
+												</div>
+											)}
+											<div className="flex gap-1 shrink-0 opacity-0 group-hover:opacity-100 focus-within:opacity-100 transition-opacity">
+												<Button
+													variant="ghost"
+													size="icon"
+													className="h-6 w-6 hover:bg-background/20"
+													onClick={(e) => {
+														e.stopPropagation();
+														startEditing(sample);
+													}}
+												>
+													<Pencil className="h-3 w-3" />
+												</Button>
+												<Button
+													variant="ghost"
+													size="icon"
+													className="h-6 w-6 hover:bg-background/20"
+													onClick={(e) => {
+														e.stopPropagation();
+														handleDelete(sample.id);
+													}}
+												>
+													<Trash2 className="h-3 w-3" />
+												</Button>
 											</div>
-											<Button
-												variant="ghost"
-												size="icon"
-												className="h-6 w-6 shrink-0"
-												onClick={(e) => {
-													e.stopPropagation();
-													handleDelete(sample.id);
-												}}
-											>
-												<Trash2 className="h-3 w-3" />
-											</Button>
 										</div>
 									</div>
 								))}
