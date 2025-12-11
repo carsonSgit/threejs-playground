@@ -17,42 +17,46 @@ export default function CodeSandboxPage() {
 	const textareaRef = useRef<HTMLTextAreaElement>(null);
 	const lastSelectedSampleIdRef = useRef<string | null>(null);
 	const isFetchingRef = useRef(false);
+	const selectedSampleRef = useRef<CodeSample | null>(null);
 
-	const fetchSamples = useCallback(
-		async (preserveSelection = true) => {
-			if (isFetchingRef.current) return;
+	useEffect(() => {
+		selectedSampleRef.current = selectedSample;
+	}, [selectedSample]);
 
-			try {
-				isFetchingRef.current = true;
-				const response = await fetch("/api/code-samples");
-				const data = await response.json();
-				const fetchedSamples = data.samples || [];
+	const fetchSamples = useCallback(async (preserveSelection = true) => {
+		if (isFetchingRef.current) return;
 
-				setSamples(fetchedSamples);
+		try {
+			isFetchingRef.current = true;
+			const response = await fetch("/api/code-samples");
+			const data = await response.json();
+			const fetchedSamples = data.samples || [];
 
-				if (fetchedSamples.length > 0) {
-					if (!selectedSample) {
+			setSamples(fetchedSamples);
+
+			const currentSelected = selectedSampleRef.current;
+
+			if (fetchedSamples.length > 0) {
+				if (!currentSelected) {
+					setSelectedSample(fetchedSamples[0]);
+				} else if (preserveSelection && currentSelected) {
+					const stillExists = fetchedSamples.find(
+						(s: CodeSample) => s.id === currentSelected.id,
+					);
+					if (!stillExists) {
 						setSelectedSample(fetchedSamples[0]);
-					} else if (preserveSelection && selectedSample) {
-						const stillExists = fetchedSamples.find(
-							(s: CodeSample) => s.id === selectedSample.id,
-						);
-						if (!stillExists) {
-							setSelectedSample(fetchedSamples[0]);
-						}
 					}
-				} else {
-					setSelectedSample(null);
 				}
-			} catch (error) {
-				console.error("Failed to fetch samples:", error);
-			} finally {
-				isFetchingRef.current = false;
-				setLoading(false);
+			} else {
+				setSelectedSample(null);
 			}
-		},
-		[selectedSample],
-	);
+		} catch (error) {
+			console.error("Failed to fetch samples:", error);
+		} finally {
+			isFetchingRef.current = false;
+			setLoading(false);
+		}
+	}, []);
 
 	useEffect(() => {
 		fetchSamples(false); // Initial load - don't preserve selection
@@ -88,7 +92,7 @@ export default function CodeSandboxPage() {
 			textareaRef.current.style.height = "auto";
 			textareaRef.current.style.height = `${textareaRef.current.scrollHeight}px`;
 		}
-	}, []);
+	}, [code]);
 
 	const handleDelete = async (sampleId: string) => {
 		try {
