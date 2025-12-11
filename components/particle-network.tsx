@@ -319,7 +319,7 @@ export default function ParticleNetwork() {
 							<button
 								type="button"
 								onClick={toggleSidebar}
-								className="flex items-center justify-center w-8 h-8 rounded hover:bg-sidebar-accent transition-colors text-sidebar-foreground hover:text-sidebar-accent-foreground"
+								className="flex items-center justify-center w-8 h-8 hover:bg-sidebar-accent transition-colors text-sidebar-foreground hover:text-sidebar-accent-foreground"
 								aria-label="Open Settings"
 							>
 								<Settings className="h-4 w-4" />
