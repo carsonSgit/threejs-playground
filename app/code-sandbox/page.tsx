@@ -304,7 +304,7 @@ ${codeContent}
 										key={sample.id}
 										role="button"
 										tabIndex={0}
-										className={`w-full p-3 border border-border rounded cursor-pointer transition-all text-left ${
+										className={`w-full p-3 border border-border cursor-pointer transition-all text-left ${
 											selectedSample?.id === sample.id
 												? "bg-sidebar-accent border-foreground/40"
 												: "bg-black/40 hover:bg-black/60"
