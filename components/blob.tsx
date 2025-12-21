@@ -507,45 +507,21 @@ export default function Blob() {
 			{/* WebGL Canvas */}
 			<div ref={containerRef} className="absolute inset-0" />
 
-			{/* Loading overlay */}
-			<div
-				className={`absolute inset-0 bg-white flex items-center justify-center transition-opacity duration-700 ${isLoaded ? "opacity-0 pointer-events-none" : "opacity-100"}`}
-			>
-				<div className="text-center">
-					<div
-						className="text-5xl font-extralight tracking-[0.4em] mb-4"
-						style={{
-							color: "#2d3748",
-							fontFamily:
-								"'Inter', -apple-system, BlinkMacSystemFont, sans-serif",
-						}}
-					>
-						MOLECULAR ENGINEERING
-					</div>
-					<div className="w-48 h-px bg-gray-200 mx-auto overflow-hidden">
-						<div
-							className="h-full bg-gray-400 transition-all duration-200"
-							style={{ width: `${loadProgress}%` }}
-						/>
-					</div>
-				</div>
-			</div>
-
 			{/* Text overlay */}
 			<div
-				className={`absolute inset-0 flex flex-col items-center justify-center pointer-events-none transition-all duration-1000 ${isLoaded ? "opacity-100 translate-y-0" : "opacity-0 translate-y-4"}`}
-				style={{ transitionDelay: "0.3s" }}
+				className={`absolute inset-0 flex items-end justify-start pointer-events-none transition-all duration-1000 ${isLoaded ? "opacity-100 translate-y-0" : "opacity-0 translate-y-4"}`}
+				style={{ transitionDelay: "0.3s", padding: "2rem" }}
 			>
 				<h1
-					className="text-5xl sm:text-6xl md:text-7xl lg:text-8xl font-extralight tracking-[0.25em] sm:tracking-[0.3em] mb-4 sm:mb-6 text-center px-4"
+					className="text-6xl sm:text-5xl md:text-6xl lg:text-9xl font-bold uppercase"
 					style={{
 						fontFamily:
 							"'Inter', -apple-system, BlinkMacSystemFont, sans-serif",
-						color: "#1a202c",
-						letterSpacing: "0.3em",
+						color: "#1e1e1e",
+						letterSpacing: "-0.04em",
 					}}
 				>
-					MOLECULAR ENGINEERING INC.
+					MOLECULAR<br />ENGINEERING INC.
 				</h1>
 			</div>
 		</div>
