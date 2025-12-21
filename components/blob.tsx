@@ -224,27 +224,33 @@ export default function Blob() {
 	useEffect(() => {
 		if (!containerRef.current) return;
 
-		// Scene setup
-		const scene = new THREE.Scene();
-		scene.background = new THREE.Color(0xffffff);
+		let cleanup: (() => void) | null = null;
 
-		const camera = new THREE.PerspectiveCamera(
-			45,
-			window.innerWidth / window.innerHeight,
-			0.1,
-			1000,
-		);
-		camera.position.set(0, 0, 12);
+		// Use requestAnimationFrame to ensure DOM is ready and container has dimensions
+		requestAnimationFrame(() => {
+			if (!containerRef.current) return;
 
-		const renderer = new THREE.WebGLRenderer({
-			antialias: true,
-			powerPreference: "high-performance",
-		});
-		renderer.setSize(window.innerWidth, window.innerHeight);
-		renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
-		renderer.toneMapping = THREE.ACESFilmicToneMapping;
-		renderer.toneMappingExposure = 1.0;
-		containerRef.current.appendChild(renderer.domElement);
+			// Scene setup
+			const scene = new THREE.Scene();
+			scene.background = new THREE.Color(0xffffff);
+
+			const camera = new THREE.PerspectiveCamera(
+				45,
+				window.innerWidth / window.innerHeight,
+				0.1,
+				1000,
+			);
+			camera.position.set(0, 0, 12);
+
+			const renderer = new THREE.WebGLRenderer({
+				antialias: true,
+				powerPreference: "high-performance",
+			});
+			renderer.setSize(window.innerWidth, window.innerHeight);
+			renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
+			renderer.toneMapping = THREE.ACESFilmicToneMapping;
+			renderer.toneMappingExposure = 1.0;
+			containerRef.current.appendChild(renderer.domElement);
 
 		// Create chrome spheres
 		const spheres: {
@@ -339,7 +345,7 @@ export default function Blob() {
 			const scale = config.scale || 1;
 
 			mesh.position.copy(pos);
-			mesh.scale.setScalar(scale);
+			mesh.scale.setScalar(scale); // Start at full scale for immediate visibility
 
 			const fullConfig: SphereConfig = {
 				position: pos.clone(),
@@ -375,8 +381,11 @@ export default function Blob() {
 
 		// Animation
 		let time = 0;
-		let introProgress = 0;
-		const introDuration = 2.0;
+		let introProgress = 1; // Start fully visible
+		const introDuration = 0.5;
+
+		// Initial render to ensure scene is visible immediately
+		composer.render();
 
 		// Mouse interaction
 		const mouse = new THREE.Vector2(0, 0);
@@ -405,10 +414,9 @@ export default function Blob() {
 				}
 			}
 
-			// Intro animation
+			// Intro animation - start immediately
 			if (introProgress < 1) {
-				introProgress = Math.min((time - loadingDuration) / introDuration, 1);
-				if (introProgress < 0) introProgress = 0;
+				introProgress = Math.min(time / introDuration, 1);
 			}
 
 			// Smooth mouse following
@@ -480,32 +488,38 @@ export default function Blob() {
 			renderer.setSize(w, h);
 			composer.setSize(w, h);
 		};
-		window.addEventListener("resize", handleResize);
+			window.addEventListener("resize", handleResize);
 
-		// Cleanup
+			// Store cleanup function
+			cleanup = () => {
+				window.removeEventListener("resize", handleResize);
+				window.removeEventListener("mousemove", handleMouseMove);
+				renderer.setAnimationLoop(null);
+
+				sphereGeometry.dispose();
+				spheres.forEach((s) => {
+					s.material.dispose();
+				});
+
+				renderer.dispose();
+				composer.dispose();
+
+				if (containerRef.current) {
+					containerRef.current.innerHTML = "";
+				}
+			};
+		});
+
+		// Return cleanup from useEffect
 		return () => {
-			window.removeEventListener("resize", handleResize);
-			window.removeEventListener("mousemove", handleMouseMove);
-			renderer.setAnimationLoop(null);
-
-			sphereGeometry.dispose();
-			spheres.forEach((s) => {
-				s.material.dispose();
-			});
-
-			renderer.dispose();
-			composer.dispose();
-
-			if (containerRef.current) {
-				containerRef.current.innerHTML = "";
-			}
+			if (cleanup) cleanup();
 		};
 	}, []);
 
 	return (
-		<div className="relative w-full h-full">
+		<div className="relative w-full h-full min-h-screen">
 			{/* WebGL Canvas */}
-			<div ref={containerRef} className="absolute inset-0" />
+			<div ref={containerRef} className="absolute inset-0 w-full h-full" />
 
 			{/* Text overlay */}
 			<div
