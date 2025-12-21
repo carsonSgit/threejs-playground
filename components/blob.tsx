@@ -218,17 +218,28 @@ interface SphereConfig {
 
 export default function Blob() {
 	const containerRef = useRef<HTMLDivElement>(null);
+	const initializedRef = useRef(false);
 	const [isLoaded, setIsLoaded] = useState(false);
 	const [loadProgress, setLoadProgress] = useState(0);
 
 	useEffect(() => {
-		if (!containerRef.current) return;
+		if (!containerRef.current || initializedRef.current) return;
+		// Prevent double initialization if container already has content
+		if (containerRef.current.children.length > 0) return;
+		
+		initializedRef.current = true;
 
 		let cleanup: (() => void) | null = null;
+		let rafId: number | null = null;
 
 		// Use requestAnimationFrame to ensure DOM is ready and container has dimensions
-		requestAnimationFrame(() => {
+		rafId = requestAnimationFrame(() => {
 			if (!containerRef.current) return;
+			// Double-check container is still empty (in case of race condition)
+			if (containerRef.current.children.length > 0) {
+				initializedRef.current = false;
+				return;
+			}
 
 			// Scene setup
 			const scene = new THREE.Scene();
@@ -512,7 +523,13 @@ export default function Blob() {
 
 		// Return cleanup from useEffect
 		return () => {
-			if (cleanup) cleanup();
+			if (rafId !== null) {
+				cancelAnimationFrame(rafId);
+			}
+			if (cleanup) {
+				cleanup();
+			}
+			initializedRef.current = false;
 		};
 	}, []);
 
