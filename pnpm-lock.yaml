@@ -10,7 +10,7 @@ importers:
     dependencies:
       '@clerk/nextjs':
         specifier: ^6.35.6
-        version: 6.35.6(next@15.5.7(react-dom@18.3.1(react@18.3.1))(react@18.3.1))(react-dom@18.3.1(react@18.3.1))(react@18.3.1)
+        version: 6.35.6(next@15.5.9(react-dom@18.3.1(react@18.3.1))(react@18.3.1))(react-dom@18.3.1(react@18.3.1))(react@18.3.1)
       '@radix-ui/react-dialog':
         specifier: ^1.1.15
         version: 1.1.15(@types/react-dom@18.3.7(@types/react@18.3.26))(@types/react@18.3.26)(react-dom@18.3.1(react@18.3.1))(react@18.3.1)
@@ -39,8 +39,8 @@ importers:
         specifier: ^0.555.0
         version: 0.555.0(react@18.3.1)
       next:
-        specifier: ^15.5.7
-        version: 15.5.7(react-dom@18.3.1(react@18.3.1))(react@18.3.1)
+        specifier: 15.5.9
+        version: 15.5.9(react-dom@18.3.1(react@18.3.1))(react@18.3.1)
       react:
         specifier: ^18.3.1
         version: 18.3.1
@@ -48,14 +48,14 @@ importers:
         specifier: ^18.3.1
         version: 18.3.1(react@18.3.1)
       react-server-dom-parcel:
-        specifier: 19.2.1
-        version: 19.2.1(react-dom@18.3.1(react@18.3.1))(react@18.3.1)
+        specifier: 19.2.2
+        version: 19.2.2(react-dom@18.3.1(react@18.3.1))(react@18.3.1)
       react-server-dom-turbopack:
-        specifier: 19.2.1
-        version: 19.2.1(react-dom@18.3.1(react@18.3.1))(react@18.3.1)
+        specifier: 19.2.2
+        version: 19.2.2(react-dom@18.3.1(react@18.3.1))(react@18.3.1)
       react-server-dom-webpack:
-        specifier: 19.2.1
-        version: 19.2.1(react-dom@18.3.1(react@18.3.1))(react@18.3.1)(webpack@5.103.0)
+        specifier: 19.2.2
+        version: 19.2.2(react-dom@18.3.1(react@18.3.1))(react@18.3.1)(webpack@5.103.0)
       tailwind-merge:
         specifier: ^3.4.0
         version: 3.4.0
@@ -381,8 +381,8 @@ packages:
   '@napi-rs/wasm-runtime@1.0.7':
     resolution: {integrity: sha512-SeDnOO0Tk7Okiq6DbXmmBODgOAb9dp9gjlphokTUxmt8U3liIP1ZsozBahH69j/RJv+Rfs6IwUKHTgQYJ/HBAw==}
 
-  '@next/env@15.5.7':
-    resolution: {integrity: sha512-4h6Y2NyEkIEN7Z8YxkA27pq6zTkS09bUSYC0xjd0NpwFxjnIKeZEeH591o5WECSmjpUhLn3H2QLJcDye3Uzcvg==}
+  '@next/env@15.5.9':
+    resolution: {integrity: sha512-4GlTZ+EJM7WaW2HEZcyU317tIQDjkQIyENDLxYJfSWlfqguN+dHkZgyQTV/7ykvobU7yEH5gKvreNrH4B6QgIg==}
 
   '@next/swc-darwin-arm64@15.5.7':
     resolution: {integrity: sha512-IZwtxCEpI91HVU/rAUOOobWSZv4P2DeTtNaCdHqLcTJU4wdNXgAySvKa/qJCgR5m6KI8UsKDXtO2B31jcaw1Yw==}
@@ -1534,8 +1534,8 @@ packages:
   neo-async@2.6.2:
     resolution: {integrity: sha512-Yd3UES5mWCSqR+qNT93S3UoYUkqAZ9lLg8a7g9rimsWmYGK8cVToA4/sF3RrshdyV3sAGMXVUmpMYOw+dLpOuw==}
 
-  next@15.5.7:
-    resolution: {integrity: sha512-+t2/0jIJ48kUpGKkdlhgkv+zPTEOoXyr60qXe68eB/pl3CMJaLeIGjzp5D6Oqt25hCBiBTt8wEeeAzfJvUKnPQ==}
+  next@15.5.9:
+    resolution: {integrity: sha512-agNLK89seZEtC5zUHwtut0+tNrc0Xw4FT/Dg+B/VLEo9pAcS9rtTKpek3V6kVcVwsB2YlqMaHdfZL4eLEVYuCg==}
     engines: {node: ^18.18.0 || ^19.8.0 || >= 20.0.0}
     hasBin: true
     peerDependencies:
@@ -1692,26 +1692,29 @@ packages:
       '@types/react':
         optional: true
 
-  react-server-dom-parcel@19.2.1:
-    resolution: {integrity: sha512-/pYJSIjVZy1sZLHlovmItuMqVl8z57jURTPn+sTCWotIm1orCodjFkBiBfY1zWKHa48d406Pble5mlr7tU3lfg==}
+  react-server-dom-parcel@19.2.2:
+    resolution: {integrity: sha512-nDIO9E5PcfjzXcHkgAn53u8DdEjMqrt3BTIOz7NAvwnbABIEnK3BI0XMmHKBgMHRu/7OlVwkAARi8draF5OLJQ==}
     engines: {node: '>=0.10.0'}
+    deprecated: High Security Vulnerability in React Server Components
     peerDependencies:
-      react: ^19.2.1
-      react-dom: ^19.2.1
+      react: ^19.2.2
+      react-dom: ^19.2.2
 
-  react-server-dom-turbopack@19.2.1:
-    resolution: {integrity: sha512-+fUCjYuYPawZ8ARi0B0nHtfTbl1RHUAgw1WjgZ1QXyi9/ebEtnpSBUKpCDWELvTFiAcGq9NNxBAmDJk/2sTobA==}
+  react-server-dom-turbopack@19.2.2:
+    resolution: {integrity: sha512-XD2+lALXL/YO+0XBCmaQqKeEm70FhK1K15BVndI/pJ01ZPJdBMcHq0aed3ev4WILVojwZuSjbEB6LO4uli0XhA==}
     engines: {node: '>=0.10.0'}
+    deprecated: High Security Vulnerability in React Server Components
     peerDependencies:
-      react: ^19.2.1
-      react-dom: ^19.2.1
+      react: ^19.2.2
+      react-dom: ^19.2.2
 
-  react-server-dom-webpack@19.2.1:
-    resolution: {integrity: sha512-6z3FuEtZ7wVWyPYRhKKRo4TF7IyQ7XrQZRW1fTjzK2mLVmcv7xJtoANSixaUJ+EFjCh2ekNOaBSoI9spiMSnNA==}
+  react-server-dom-webpack@19.2.2:
+    resolution: {integrity: sha512-E/4xJS8dS6b6sEXio0WoNrDY2d7FjjfEwan547ew4QSeefH7OSB+I7tgBCDV//TL+UUPNR/Fa5Qy3qiywOgdTg==}
     engines: {node: '>=0.10.0'}
+    deprecated: High Security Vulnerability in React Server Components
     peerDependencies:
-      react: ^19.2.1
-      react-dom: ^19.2.1
+      react: ^19.2.2
+      react-dom: ^19.2.2
       webpack: ^5.59.0
 
   react-style-singleton@2.2.3:
@@ -2058,13 +2061,13 @@ snapshots:
       react-dom: 18.3.1(react@18.3.1)
       tslib: 2.8.1
 
-  '@clerk/nextjs@6.35.6(next@15.5.7(react-dom@18.3.1(react@18.3.1))(react@18.3.1))(react-dom@18.3.1(react@18.3.1))(react@18.3.1)':
+  '@clerk/nextjs@6.35.6(next@15.5.9(react-dom@18.3.1(react@18.3.1))(react@18.3.1))(react-dom@18.3.1(react@18.3.1))(react@18.3.1)':
     dependencies:
       '@clerk/backend': 2.25.0(react-dom@18.3.1(react@18.3.1))(react@18.3.1)
       '@clerk/clerk-react': 5.57.1(react-dom@18.3.1(react@18.3.1))(react@18.3.1)
       '@clerk/shared': 3.37.0(react-dom@18.3.1(react@18.3.1))(react@18.3.1)
       '@clerk/types': 4.101.4(react-dom@18.3.1(react@18.3.1))(react@18.3.1)
-      next: 15.5.7(react-dom@18.3.1(react@18.3.1))(react@18.3.1)
+      next: 15.5.9(react-dom@18.3.1(react@18.3.1))(react@18.3.1)
       react: 18.3.1
       react-dom: 18.3.1(react@18.3.1)
       server-only: 0.0.1
@@ -2261,7 +2264,7 @@ snapshots:
       '@tybys/wasm-util': 0.10.1
     optional: true
 
-  '@next/env@15.5.7': {}
+  '@next/env@15.5.9': {}
 
   '@next/swc-darwin-arm64@15.5.7':
     optional: true
@@ -3252,9 +3255,9 @@ snapshots:
 
   neo-async@2.6.2: {}
 
-  next@15.5.7(react-dom@18.3.1(react@18.3.1))(react@18.3.1):
+  next@15.5.9(react-dom@18.3.1(react@18.3.1))(react@18.3.1):
     dependencies:
-      '@next/env': 15.5.7
+      '@next/env': 15.5.9
       '@swc/helpers': 0.5.15
       caniuse-lite: 1.0.30001755
       postcss: 8.4.31
@@ -3402,19 +3405,19 @@ snapshots:
     optionalDependencies:
       '@types/react': 18.3.26
 
-  react-server-dom-parcel@19.2.1(react-dom@18.3.1(react@18.3.1))(react@18.3.1):
+  react-server-dom-parcel@19.2.2(react-dom@18.3.1(react@18.3.1))(react@18.3.1):
     dependencies:
       react: 18.3.1
       react-dom: 18.3.1(react@18.3.1)
 
-  react-server-dom-turbopack@19.2.1(react-dom@18.3.1(react@18.3.1))(react@18.3.1):
+  react-server-dom-turbopack@19.2.2(react-dom@18.3.1(react@18.3.1))(react@18.3.1):
     dependencies:
       acorn-loose: 8.5.2
       neo-async: 2.6.2
       react: 18.3.1
       react-dom: 18.3.1(react@18.3.1)
 
-  react-server-dom-webpack@19.2.1(react-dom@18.3.1(react@18.3.1))(react@18.3.1)(webpack@5.103.0):
+  react-server-dom-webpack@19.2.2(react-dom@18.3.1(react@18.3.1))(react@18.3.1)(webpack@5.103.0):
     dependencies:
       acorn-loose: 8.5.2
       neo-async: 2.6.2
