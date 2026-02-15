@@ -1,4 +1,4 @@
-import { Action, z } from "@botpress/runtime";
+import { Action, adk, z } from "@botpress/runtime";
 
 export default new Action({
 	name: "generateThreejsCode",
@@ -19,9 +19,9 @@ export default new Action({
 		explanation: z.string().optional(),
 		error: z.string().optional(),
 	}),
-	async handler({ input, ai }) {
+	async handler({ input }) {
 		try {
-			const complexityInstructions = {
+			const complexityInstructions: Record<string, string> = {
 				beginner:
 					"Use basic geometries, simple materials, straightforward animations",
 				intermediate:
@@ -30,9 +30,11 @@ export default new Action({
 					"Use custom shaders, post-processing, instancing, advanced techniques",
 			};
 
-			const prompt = `Generate a complete, runnable Three.js code sample for: "${input.concept}"
+			const complexity = input.complexity || "beginner";
 
-Complexity: ${input.complexity}
+			const codePrompt = `Generate a complete, runnable Three.js code sample for: "${input.concept}"
+
+Complexity: ${complexity}
 ${input.additionalRequirements ? `Requirements: ${input.additionalRequirements}` : ""}
 
 Must include:
@@ -46,19 +48,16 @@ Must include:
 - Modern Three.js (r150+)
 - Creative and visually interesting (NOT basic cubes)
 
-Style: ${complexityInstructions[input.complexity || "beginner"]}
+Style: ${complexityInstructions[complexity]}
 
 Return ONLY valid TypeScript/JavaScript code ready to run in browser.
 No markdown, no extra comments, no explanations.`;
 
-			const { output } = await ai.generate({
-				model: "gpt-4o",
-				messages: [{ role: "user", content: prompt }],
+			let code = await adk.zai.text(codePrompt, {
 				temperature: 0.8,
-				max_tokens: 2000,
+				length: 2000,
 			});
 
-			let code = output?.content || "";
 			code = code.replace(/```(?:typescript|javascript|ts|js)?\n?/g, "");
 			code = code.replace(/```\n?$/g, "");
 			code = code.trim();
@@ -68,28 +67,25 @@ No markdown, no extra comments, no explanations.`;
 			}
 
 			const titlePrompt = `Create a short title (max 4 words, use underscores) for: "${input.concept}". Return ONLY the title.`;
-			const titleResult = await ai.generate({
-				model: "gpt-4o-mini",
-				messages: [{ role: "user", content: titlePrompt }],
-				temperature: 0.7,
-				max_tokens: 20,
-			});
-
 			const title =
-				titleResult.output?.content?.trim().replace(/[^a-z0-9_\s]/gi, "_") ||
-				"custom_example";
+				(
+					await adk.zai.text(titlePrompt, {
+						temperature: 0.7,
+						length: 20,
+					})
+				)
+					.trim()
+					.replace(/[^a-z0-9_\s]/gi, "_") || "custom_example";
 
-			const explanationPrompt = `Explain in 1-2 sentences what this does: "${input.concept}" (${input.complexity} complexity). Be concise.`;
-			const explanationResult = await ai.generate({
-				model: "gpt-4o-mini",
-				messages: [{ role: "user", content: explanationPrompt }],
-				temperature: 0.5,
-				max_tokens: 100,
-			});
-
+			const explanationPrompt = `Explain in 1-2 sentences what this does: "${input.concept}" (${complexity} complexity). Be concise.`;
 			const explanation =
-				explanationResult.output?.content?.trim() ||
-				`A ${input.complexity} Three.js example demonstrating ${input.concept}`;
+				(
+					await adk.zai.text(explanationPrompt, {
+						temperature: 0.5,
+						length: 100,
+					})
+				).trim() ||
+				`A ${complexity} Three.js example demonstrating ${input.concept}`;
 
 			return { success: true, code, title, explanation };
 		} catch (error) {

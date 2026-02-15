@@ -9,11 +9,11 @@ importers:
   .:
     dependencies:
       '@botpress/runtime':
-        specifier: ^1.11.0
-        version: 1.11.0(typescript@5.9.3)
+        specifier: ^1.13.18
+        version: 1.13.18(typescript@5.9.3)
       '@botpress/sdk':
-        specifier: ^4.20.2
-        version: 4.20.2(@bpinternal/zui@1.2.2)
+        specifier: ^5.4.3
+        version: 5.4.3(@bpinternal/zui@1.3.3)
     devDependencies:
       typescript:
         specifier: ^5.9.3
@@ -160,51 +160,47 @@ packages:
     resolution: {integrity: sha512-qQ5m48eI/MFLQ5PxQj4PFaprjyCTLI37ElWMmNs0K8Lk3dVeOdNpB3ks8jc7yM5CDmVC73eMVk/trk3fgmrUpA==}
     engines: {node: '>=6.9.0'}
 
-  '@botpress/client@1.27.2':
-    resolution: {integrity: sha512-fTP42EDRnhRZDdRFAUQlMUDQ0CxMYchnhDsT/4Luubz6n8gKea9eBz5t0UngCzD98Eat5D+UbnfkAR89IQDWpA==}
+  '@botpress/client@1.35.0':
+    resolution: {integrity: sha512-OmA6xGhRr0OPKshx9EFaz5DGe4j7c0DIQ7+vy81vSlvKx0ZXwGo/jU0ccfSDDMZUMwc90zJJ1LnbUkC8E3l8nQ==}
     engines: {node: '>=18.0.0'}
 
-  '@botpress/cognitive@0.2.1':
-    resolution: {integrity: sha512-h7+/SOvGgUsVGQ0w5bsOPdgsMOl9WVGGNhtTeQMu5MRxMhjpGVuIcYZ6RewspiVBpNpbMwHg9Pbco7z00hcK1w==}
+  '@botpress/cognitive@0.3.14':
+    resolution: {integrity: sha512-CoRllzxDEVDQfi+ajGfIO9ZRxifI8O1q5uYPD7X8j7jcRTb04VcAiER7cRk7ybabSwvwIsp6odOKQ9iKxUBvTw==}
     engines: {node: '>=18.0.0'}
 
-  '@botpress/cognitive@0.3.1':
-    resolution: {integrity: sha512-trpuTdrnXS6GbkgIwRo9/5HCgZj/MNjktcgHgCpch9CEgV0pNddr9Q6Enz8zX9EwNIVSysQM6CkDSCYwljlrXw==}
-    engines: {node: '>=18.0.0'}
-
-  '@botpress/runtime@1.11.0':
-    resolution: {integrity: sha512-Gw4sxY6fX+R23zrokoOYEMmnseEFHF+eVhg3yq60VAGxOcZiBjwNpH88K3V+jQ3g26qV5OA2GNa5S0o8c80xcQ==}
+  '@botpress/runtime@1.13.18':
+    resolution: {integrity: sha512-6VNQo7Z5tvAixe5zRF5oqmUNFt8hwRdk1Fw8/lPYAAUMIzWID1IJn/WYOE5wp2SjO8idUMZEn4bohH74s7De+Q==}
     engines: {bun: '>=1.3.0', node: '>=22.0.0'}
     peerDependencies:
       typescript: '>=4.5.0'
 
-  '@botpress/sdk@4.20.2':
-    resolution: {integrity: sha512-x4H1GlHBybBGjcd14oxW5jDnSdB/J57+U7X71toPG6nfFrzS3+FdJY0sklL/tCJAEsnRoYMaPkUKk4/l+GQgmg==}
+  '@botpress/sdk@5.4.3':
+    resolution: {integrity: sha512-DF7q2dAt9fjDqb06lpUPgXcGxVJIziWf1s+toCJ9Qcnvwv4/ChWL77Que2opKnP8hqu+nmgjT2nNiYGKLN25Wg==}
     engines: {node: '>=18.0.0'}
     peerDependencies:
-      '@bpinternal/zui': 1.2.1
+      '@bpinternal/zui': ^1.3.3
       esbuild: ^0.16.12
     peerDependenciesMeta:
       esbuild:
         optional: true
 
-  '@botpress/zai@2.5.3':
-    resolution: {integrity: sha512-u2656gZAVl5u97RQrrwwqTyEJw2Oys/plPJdRaTh//8sYkdlAKXlhUMHd/w0MeZ9yP2aDJa1ZVIFC1uYJ82DMQ==}
+  '@botpress/zai@2.5.17':
+    resolution: {integrity: sha512-3csrg8Klo1uNTVAnG4qEhJFCjOaruOnCFva7j79yuSu/oAm/bskrypIEan5FNxwp5g9znSC2Av81LpsBVZeDSg==}
     engines: {node: '>=18.0.0'}
     peerDependencies:
       '@bpinternal/thicktoken': ^1.0.0
-      '@bpinternal/zui': ^1.2.2
+      '@bpinternal/zui': ^1.3.3
 
-  '@bpinternal/const@0.3.9':
-    resolution: {integrity: sha512-5fOO7fdjBKrnPohOJI1WRwh4VtNdRTD86xlrvA4RH3QfWla3K1WnUZNEUR1F2Hx7rKH37IMVYZG/3Mkcp8VlPQ==}
+  '@bpinternal/const@0.4.2':
+    resolution: {integrity: sha512-01q5QJaBKjr6QMzqGI1dFssYDJfWGb1rlu6F7DUD1cvzaHWrbY01zo6YKvl0OkJ//11Is37h8UrOzJ64p55MNA==}
 
   '@bpinternal/thicktoken@1.0.6':
     resolution: {integrity: sha512-sxatJ0J6NjW8WPUPtxu1VzhYQF1HXyRe3PSVWbct2nAVIJr6TTKx2LxplVk5mpdapJzHmnOKSsISbuWtFuUi0A==}
     engines: {node: '>=16.0.0', pnpm: 8.6.2}
 
-  '@bpinternal/zui@1.2.2':
-    resolution: {integrity: sha512-Ngs3ySRoDTfWAeGYLnKLr4D4nvMh+MGlDt4vEzXnTzIWcvWK+u1CVPt81nr9ZgHzkhJkZEkZVgwbwADp7rQcrQ==}
-    engines: {node: '>=16.0.0', pnpm: 8.6.2}
+  '@bpinternal/zui@1.3.3':
+    resolution: {integrity: sha512-nTpX/jzx/zXavPMuCOUmgHJVlV3O/8QM8B3GPdgCXSQfxO5yYuGR4kF/xg0x32Esm3svzvK0qMAr6s8MKdgNKA==}
+    engines: {node: '>=18.0.0'}
 
   '@isaacs/balanced-match@4.0.1':
     resolution: {integrity: sha512-yzMTt9lEb8Gv7zRioUilSglI0c0smZ9k5D65677DLWLtWJaXIS3CqcGyUFByYKlnUj6TkjLVs54fBl6+TiGQDQ==}
@@ -240,8 +236,8 @@ packages:
   '@jridgewell/trace-mapping@0.3.31':
     resolution: {integrity: sha512-zzNR+SdQSDJzc8joaeP8QQoCQr8NuYx2dIIytl1QeBEZHJ9uW6hebsrYgbz8hJwUQao3TWCMtmfV8Nu1twOLAw==}
 
-  '@opentelemetry/api-logs@0.205.0':
-    resolution: {integrity: sha512-wBlPk1nFB37Hsm+3Qy73yQSobVn28F4isnWIBvKpd5IUH/eat8bwcL02H9yzmHyyPmukeccSl2mbN5sDQZYnPg==}
+  '@opentelemetry/api-logs@0.208.0':
+    resolution: {integrity: sha512-CjruKY9V6NMssL/T1kAFgzosF1v9o6oeN+aX5JB/C/xPNtmgIJqcXHG7fA82Ou1zCpWGl4lROQUKwUNE1pMCyg==}
     engines: {node: '>=8.0.0'}
 
   '@opentelemetry/api@1.9.0':
@@ -254,26 +250,20 @@ packages:
     peerDependencies:
       '@opentelemetry/api': '>=1.0.0 <1.10.0'
 
-  '@opentelemetry/core@2.1.0':
-    resolution: {integrity: sha512-RMEtHsxJs/GiHHxYT58IY57UXAQTuUnZVco6ymDEqTNlJKTimM4qPUPVe8InNFyBjhHBEAx4k3Q8LtNayBsbUQ==}
-    engines: {node: ^18.19.0 || >=20.6.0}
-    peerDependencies:
-      '@opentelemetry/api': '>=1.0.0 <1.10.0'
-
   '@opentelemetry/core@2.2.0':
     resolution: {integrity: sha512-FuabnnUm8LflnieVxs6eP7Z383hgQU4W1e3KJS6aOG3RxWxcHyBxH8fDMHNgu/gFx/M2jvTOW/4/PHhLz6bjWw==}
     engines: {node: ^18.19.0 || >=20.6.0}
     peerDependencies:
       '@opentelemetry/api': '>=1.0.0 <1.10.0'
 
-  '@opentelemetry/instrumentation-http@0.205.0':
-    resolution: {integrity: sha512-6fOgRlV7ypBuEzCQP7vXkLQxz3UL1FhE24rAlMRbwGvPAnZLvutcG/fq9FI/n+VU23dOpYexocYsXCf5oy/AXw==}
+  '@opentelemetry/instrumentation-http@0.208.0':
+    resolution: {integrity: sha512-rhmK46DRWEbQQB77RxmVXGyjs6783crXCnFjYQj+4tDH/Kpv9Rbg3h2kaNyp5Vz2emF1f9HOQQvZoHzwMWOFZQ==}
     engines: {node: ^18.19.0 || >=20.6.0}
     peerDependencies:
       '@opentelemetry/api': ^1.3.0
 
-  '@opentelemetry/instrumentation@0.205.0':
-    resolution: {integrity: sha512-cgvm7tvQdu9Qo7VurJP84wJ7ZV9F6WqDDGZpUc6rUEXwjV7/bXWs0kaYp9v+1Vh1+3TZCD3i6j/lUBcPhu8NhA==}
+  '@opentelemetry/instrumentation@0.208.0':
+    resolution: {integrity: sha512-Eju0L4qWcQS+oXxi6pgh7zvE2byogAkcsVv0OjHF/97iOz1N/aKE6etSGowYkie+YA1uo6DNwdSxaaNnLvcRlA==}
     engines: {node: ^18.19.0 || >=20.6.0}
     peerDependencies:
       '@opentelemetry/api': ^1.3.0
@@ -370,8 +360,8 @@ packages:
   caniuse-lite@1.0.30001757:
     resolution: {integrity: sha512-r0nnL/I28Zi/yjk1el6ilj27tKcdjLsNqAOZr0yVjWPrSQyHgKI2INaEWw21bAQSv2LXRt1XuCS/GomNpWOxsQ==}
 
-  cjs-module-lexer@1.4.3:
-    resolution: {integrity: sha512-9z8TZaGM1pfswYeXrUpzPrkx8UnWYdhJclsiYMm6x/w5+nN+8Tf/LnAgfLGQCm59qAOxU8WwHEq2vNwF6i4j+Q==}
+  cjs-module-lexer@2.2.0:
+    resolution: {integrity: sha512-4bHTS2YuzUvtoLjdy+98ykbNB5jS0+07EvFNXerqZQJ89F7DI6ET7OQo/HJuW6K0aVsKA9hj9/RVb2kQVOrPDQ==}
 
   color-convert@2.0.1:
     resolution: {integrity: sha512-RRECPsj7iu/xb5oKYcsFHSppFNnsj/52OVTRKb4zP5onXwVF3zVmmToNcOfGC+CRDpfK/U584fMg38ZHCaElKQ==}
@@ -400,8 +390,8 @@ packages:
       supports-color:
         optional: true
 
-  dedent@1.7.0:
-    resolution: {integrity: sha512-HGFtf8yhuhGhqO07SV79tRp+br4MnbdjeVxotpn1QBl30pcLLCQjX5b2295ll0fv8RKDKsmWYrl05usHM9CewQ==}
+  dedent@1.7.1:
+    resolution: {integrity: sha512-9JmrhGZpOlEgOLdQgSm0zxFaYoQon408V1v49aqTWuXENVlnCuY9JBZcXZiCsZQWDjTm5Qf/nIvAy77mXDAjEg==}
     peerDependencies:
       babel-plugin-macros: ^3.1.0
     peerDependenciesMeta:
@@ -454,8 +444,8 @@ packages:
   fast-safe-stringify@2.1.1:
     resolution: {integrity: sha512-W+KJc2dmILlPplD/H4K9l9LcAHAfPtP6BY84uVLXQ6Evcz9Lcg33Y2z1IVblT6xdY54PXYVHEv+0Wpq8Io6zkA==}
 
-  fast-xml-parser@5.3.2:
-    resolution: {integrity: sha512-n8v8b6p4Z1sMgqRmqLJm3awW4NX7NkaKPfb3uJIBTSH7Pdvufi3PQ3/lJLQrvxcMYl7JI2jnDO90siPEpD8JBA==}
+  fast-xml-parser@5.3.6:
+    resolution: {integrity: sha512-QNI3sAvSvaOiaMl8FYU4trnEzCwiRr8XMWgAHzlrWpTSj+QaCSvOf1h82OEP1s4hiAXhnbXSyFWCf4ldZzZRVA==}
     hasBin: true
 
   follow-redirects@1.15.11:
@@ -496,6 +486,7 @@ packages:
   glob@11.1.0:
     resolution: {integrity: sha512-vuNwKSaKiqm7g0THUBu2x7ckSs3XJLXE+2ssL7/MfTGPLLcrJQ/4Uq1CjPTtO5cCIiRxqvN6Twy1qOwhL0Xjcw==}
     engines: {node: 20 || >=22}
+    deprecated: Old versions of glob are not supported, and contain widely publicized security vulnerabilities, which have been fixed in the current version. Please update. Support for old versions may be purchased (at exorbitant rates) by contacting i@izs.me
     hasBin: true
 
   gopd@1.2.0:
@@ -522,12 +513,8 @@ packages:
   ieee754@1.2.1:
     resolution: {integrity: sha512-dcyqhDvX1C46lXZcVqCpK+FtMRQVdIMN6/Df5js2zouUsqG7I6sFxitIC+7KYK29KdXOLHdu9zL4sFnoVQnqaA==}
 
-  import-in-the-middle@1.15.0:
-    resolution: {integrity: sha512-bpQy+CrsRmYmoPMAE/0G33iwRqwW4ouqdRg8jgbH3aKuCtOc8lxgmYXg2dMM92CRiGP660EtBcymH/eVUpCSaA==}
-
-  is-core-module@2.16.1:
-    resolution: {integrity: sha512-UfoeMA6fIJ8wTYFEUjelnaGI67v6+N7qXJEvQuIGa99l4xsCruSYOVSQ0uPANn4dAzm8lkYPaKLrrijLq7x23w==}
-    engines: {node: '>= 0.4'}
+  import-in-the-middle@2.0.6:
+    resolution: {integrity: sha512-3vZV3jX0XRFW3EJDTwzWoZa+RH1b8eTTx6YOCjglrLyPuepwoBti1k3L2dKwdCUrnVEfc5CuRuGstaC/uQJJaw==}
 
   is-fullwidth-code-point@3.0.0:
     resolution: {integrity: sha512-zymm5+u+sCsSWyD9qNaejV3DFvhCKclKdizYaJUuHA83RLjb7nSuGnddCHGv0hk+KY7BMAlsWeK4Ueg6EV6XQg==}
@@ -561,13 +548,13 @@ packages:
     resolution: {integrity: sha512-WJeiE0jGfxYmtLwBTEk8+y/mYcaleyLXWaqp5bJu0/ZTSeG0KQq/wWQ8pmnkKenEdN6pdnn6QtcoSUkbqDHWNw==}
     hasBin: true
 
-  llmz@0.0.33:
-    resolution: {integrity: sha512-r+5Z+AseEoj99a6cory4CujCcKulEtLwrDrNU63+KOV4YtABLDpjz/NLffnBIEvC/HTP9W2aQ7/vi4kg9KaxBA==}
+  llmz@0.0.37:
+    resolution: {integrity: sha512-Q+IkYww8xoRTs9hFUygjLa7cPLfEEA/O/LRU337yLmbSB7QgBJl2uwwCbBmz9tfrjhYzDF7NSognuULC06LjqQ==}
     peerDependencies:
-      '@botpress/client': 1.27.2
-      '@botpress/cognitive': 0.3.1
+      '@botpress/client': 1.28.0
+      '@botpress/cognitive': 0.3.3
       '@bpinternal/thicktoken': ^1.0.5
-      '@bpinternal/zui': 1.2.1
+      '@bpinternal/zui': 1.3.1
     peerDependenciesMeta:
       '@botpress/client':
         optional: true
@@ -642,9 +629,6 @@ packages:
     resolution: {integrity: sha512-ojmeN0qd+y0jszEtoY48r0Peq5dwMEkIlCOu6Q5f41lfkswXuKtYrhgoTpLnyIcHm24Uhqx+5Tqm2InSwLhE6Q==}
     engines: {node: '>=8'}
 
-  path-parse@1.0.7:
-    resolution: {integrity: sha512-LDJzPVEEEPR+y48z93A0Ed0yXb8pAByGWo/k5YYdYgpY2/2EsOsksJrq7lOHxryrVOn1ejG6oAp8ahvOIQD8sw==}
-
   path-scurry@2.0.1:
     resolution: {integrity: sha512-oWyT4gICAu+kaA7QWk/jvCHWarMKNs6pXOGWKDTr7cw4IGcUbW+PeTfbaQiLGheFRpjo6O9J0PmyMfQPjH71oA==}
     engines: {node: 20 || >=22}
@@ -671,14 +655,9 @@ packages:
   quickjs-emscripten-core@0.31.0:
     resolution: {integrity: sha512-oQz8p0SiKDBc1TC7ZBK2fr0GoSHZKA0jZIeXxsnCyCs4y32FStzCW4d1h6E1sE0uHDMbGITbk2zhNaytaoJwXQ==}
 
-  require-in-the-middle@7.5.2:
-    resolution: {integrity: sha512-gAZ+kLqBdHarXB64XpAe2VCjB7rIRv+mU8tfRWziHRJ5umKsIHN2tLLv6EtMw7WCdP19S0ERVMldNvxYCHnhSQ==}
-    engines: {node: '>=8.6.0'}
-
-  resolve@1.22.11:
-    resolution: {integrity: sha512-RfqAvLnMl313r7c9oclB1HhUEAezcpLjz95wFH4LVuhk9JF/r22qmVP9AMmOU4vMX7Q8pN8jwNg/CSpdFnMjTQ==}
-    engines: {node: '>= 0.4'}
-    hasBin: true
+  require-in-the-middle@8.0.1:
+    resolution: {integrity: sha512-QT7FVMXfWOYFbeRBF6nu+I6tr2Tf3u0q8RIEjNob/heKY/nh7drD/k7eeMFmSQgnTtCzLDcCu/XEnpW2wk4xCQ==}
+    engines: {node: '>=9.3.0 || >=8.10.0 <9.0.0'}
 
   semver@6.3.1:
     resolution: {integrity: sha512-BR7VvDCVHO+q2xBEWskxS6DJE1qRnb7DxzUrogb71CWoSficBxYsiAGd+Kl0mmq/MprG9yArRkyrQxTO6XjMzA==}
@@ -737,12 +716,8 @@ packages:
     resolution: {integrity: sha512-gmBGslpoQJtgnMAvOVqGZpEz9dyoKTCzy2nfz/n8aIFhN/jCE/rCmcxabB6jOOHV+0WNnylOxaxBQPSvcWklhA==}
     engines: {node: '>=12'}
 
-  strnum@2.1.1:
-    resolution: {integrity: sha512-7ZvoFTiCnGxBtDqJ//Cu6fWtZtc7Y3x+QOirG15wztbdngGSkht27o2pyGWrVy0b4WAy3jbKmnoK6g5VlVNUUw==}
-
-  supports-preserve-symlinks-flag@1.0.0:
-    resolution: {integrity: sha512-ot0WnXS9fgdkgIcePe6RHNk1WA8+muPa6cSjeR3V8K27q9BB1rTE3R1p7Hv0z1ZyAc8s6Vvv8DIyWf681MAt0w==}
-    engines: {node: '>= 0.4'}
+  strnum@2.1.2:
+    resolution: {integrity: sha512-l63NF9y/cLROq/yqKXSLtcMeeyOfnSQlfMSlzFt/K73oIaD8DGaQWd7Z34X9GPiKqP5rbSh84Hl4bOlLcjiSrQ==}
 
   typescript@5.9.3:
     resolution: {integrity: sha512-jl1vZzPDinLr9eUt3J/t7V6FgNEw9QjvBPdysz9KfQDD41fQrC2Y4vKQdiaUpFT4bXlb1RHhLpp8wtm6M5TgSw==}
@@ -758,8 +733,8 @@ packages:
     resolution: {integrity: sha512-fIRiVTJNcSRmXKPZtGzFQv9WRrZ3M9eoptl/teFJvjOzmpU+/K/JH6HZ8deBfb5vMEpicJcLn7JmvdknlMq7Zg==}
     hasBin: true
 
-  ulid@3.0.1:
-    resolution: {integrity: sha512-dPJyqPzx8preQhqq24bBG1YNkvigm87K8kVEHCD+ruZg24t6IFEFv00xMWfxcC4djmFtiTLdFuADn4+DOz6R7Q==}
+  ulid@3.0.2:
+    resolution: {integrity: sha512-yu26mwteFYzBAot7KVMqFGCVpsF6g8wXfJzQUHvu1no3+rRRSFcSV2nKeYvNPLD2J4b08jYBDhHUjeH0ygIl9w==}
     hasBin: true
 
   undici@7.16.0:
@@ -794,6 +769,9 @@ packages:
   yocto-queue@1.2.2:
     resolution: {integrity: sha512-4LCcse/U2MHZ63HAJVE+v71o7yOdIe4cZ70Wpf8D/IyjDKYQLV5GD46B+hSTjJsvV5PztjvHoU580EftxjDZFQ==}
     engines: {node: '>=12.20'}
+
+  zod@3.25.76:
+    resolution: {integrity: sha512-gzUt/qt81nXsFGKIFcC3YnfEAx5NkunCfnDlvuBSSFS02bcXu4Lmea0AFIUwbLWxWPx3d9p8S5QoaujKcNQxcQ==}
 
 snapshots:
 
@@ -996,7 +974,7 @@ snapshots:
       '@babel/helper-string-parser': 7.27.1
       '@babel/helper-validator-identifier': 7.28.5
 
-  '@botpress/client@1.27.2':
+  '@botpress/client@1.35.0':
     dependencies:
       axios: 1.13.2
       axios-retry: 4.5.0(axios@1.13.2)
@@ -1005,47 +983,42 @@ snapshots:
     transitivePeerDependencies:
       - debug
 
-  '@botpress/cognitive@0.2.1':
+  '@botpress/cognitive@0.3.14':
     dependencies:
       exponential-backoff: 3.1.3
       nanoevents: 9.1.0
 
-  '@botpress/cognitive@0.3.1':
+  '@botpress/runtime@1.13.18(typescript@5.9.3)':
     dependencies:
-      exponential-backoff: 3.1.3
-      nanoevents: 9.1.0
-
-  '@botpress/runtime@1.11.0(typescript@5.9.3)':
-    dependencies:
-      '@botpress/client': 1.27.2
-      '@botpress/cognitive': 0.2.1
-      '@botpress/sdk': 4.20.2(@bpinternal/zui@1.2.2)
-      '@botpress/zai': 2.5.3(@bpinternal/thicktoken@1.0.6)(@bpinternal/zui@1.2.2)
-      '@bpinternal/const': 0.3.9
+      '@botpress/client': 1.35.0
+      '@botpress/cognitive': 0.3.14
+      '@botpress/sdk': 5.4.3(@bpinternal/zui@1.3.3)
+      '@botpress/zai': 2.5.17(@bpinternal/thicktoken@1.0.6)(@bpinternal/zui@1.3.3)
+      '@bpinternal/const': 0.4.2
       '@bpinternal/thicktoken': 1.0.6
-      '@bpinternal/zui': 1.2.2
+      '@bpinternal/zui': 1.3.3
       '@opentelemetry/api': 1.9.0
       '@opentelemetry/context-async-hooks': 2.2.0(@opentelemetry/api@1.9.0)
       '@opentelemetry/core': 2.2.0(@opentelemetry/api@1.9.0)
-      '@opentelemetry/instrumentation': 0.205.0(@opentelemetry/api@1.9.0)
-      '@opentelemetry/instrumentation-http': 0.205.0(@opentelemetry/api@1.9.0)
+      '@opentelemetry/instrumentation': 0.208.0(@opentelemetry/api@1.9.0)
+      '@opentelemetry/instrumentation-http': 0.208.0(@opentelemetry/api@1.9.0)
       '@opentelemetry/resources': 2.2.0(@opentelemetry/api@1.9.0)
       '@opentelemetry/sdk-trace-base': 2.2.0(@opentelemetry/api@1.9.0)
       '@opentelemetry/sdk-trace-node': 2.2.0(@opentelemetry/api@1.9.0)
       '@opentelemetry/semantic-conventions': 1.38.0
       axios: 1.13.2
       bytes: 3.1.2
-      dedent: 1.7.0
+      dedent: 1.7.1
       fast-safe-stringify: 2.1.1
-      fast-xml-parser: 5.3.2
+      fast-xml-parser: 5.3.6
       glob: 11.1.0
-      llmz: 0.0.33(@botpress/client@1.27.2)(@botpress/cognitive@0.2.1)(@bpinternal/thicktoken@1.0.6)(@bpinternal/zui@1.2.2)
+      llmz: 0.0.37(@botpress/client@1.35.0)(@botpress/cognitive@0.3.14)(@bpinternal/thicktoken@1.0.6)(@bpinternal/zui@1.3.3)
       lodash: 4.17.21
       ms: 2.1.3
       object-sizeof: 2.6.5
       pretty-bytes: 7.1.0
       typescript: 5.9.3
-      ulid: 3.0.1
+      ulid: 3.0.2
       undici: 7.16.0
     transitivePeerDependencies:
       - babel-plugin-macros
@@ -1053,30 +1026,32 @@ snapshots:
       - esbuild
       - supports-color
 
-  '@botpress/sdk@4.20.2(@bpinternal/zui@1.2.2)':
+  '@botpress/sdk@5.4.3(@bpinternal/zui@1.3.3)':
     dependencies:
-      '@botpress/client': 1.27.2
-      '@bpinternal/zui': 1.2.2
+      '@botpress/client': 1.35.0
+      '@bpinternal/zui': 1.3.3
       browser-or-node: 2.1.1
       semver: 7.7.3
     transitivePeerDependencies:
       - debug
 
-  '@botpress/zai@2.5.3(@bpinternal/thicktoken@1.0.6)(@bpinternal/zui@1.2.2)':
+  '@botpress/zai@2.5.17(@bpinternal/thicktoken@1.0.6)(@bpinternal/zui@1.3.3)':
     dependencies:
-      '@botpress/cognitive': 0.3.1
+      '@botpress/cognitive': 0.3.14
       '@bpinternal/thicktoken': 1.0.6
-      '@bpinternal/zui': 1.2.2
+      '@bpinternal/zui': 1.3.3
       json5: 2.2.3
       jsonrepair: 3.13.1
       lodash-es: 4.17.21
       p-limit: 7.2.0
 
-  '@bpinternal/const@0.3.9': {}
+  '@bpinternal/const@0.4.2':
+    dependencies:
+      zod: 3.25.76
 
   '@bpinternal/thicktoken@1.0.6': {}
 
-  '@bpinternal/zui@1.2.2': {}
+  '@bpinternal/zui@1.3.3': {}
 
   '@isaacs/balanced-match@4.0.1': {}
 
@@ -1118,7 +1093,7 @@ snapshots:
       '@jridgewell/resolve-uri': 3.1.2
       '@jridgewell/sourcemap-codec': 1.5.5
 
-  '@opentelemetry/api-logs@0.205.0':
+  '@opentelemetry/api-logs@0.208.0':
     dependencies:
       '@opentelemetry/api': 1.9.0
 
@@ -1128,32 +1103,27 @@ snapshots:
     dependencies:
       '@opentelemetry/api': 1.9.0
 
-  '@opentelemetry/core@2.1.0(@opentelemetry/api@1.9.0)':
-    dependencies:
-      '@opentelemetry/api': 1.9.0
-      '@opentelemetry/semantic-conventions': 1.38.0
-
   '@opentelemetry/core@2.2.0(@opentelemetry/api@1.9.0)':
     dependencies:
       '@opentelemetry/api': 1.9.0
       '@opentelemetry/semantic-conventions': 1.38.0
 
-  '@opentelemetry/instrumentation-http@0.205.0(@opentelemetry/api@1.9.0)':
+  '@opentelemetry/instrumentation-http@0.208.0(@opentelemetry/api@1.9.0)':
     dependencies:
       '@opentelemetry/api': 1.9.0
-      '@opentelemetry/core': 2.1.0(@opentelemetry/api@1.9.0)
-      '@opentelemetry/instrumentation': 0.205.0(@opentelemetry/api@1.9.0)
+      '@opentelemetry/core': 2.2.0(@opentelemetry/api@1.9.0)
+      '@opentelemetry/instrumentation': 0.208.0(@opentelemetry/api@1.9.0)
       '@opentelemetry/semantic-conventions': 1.38.0
       forwarded-parse: 2.1.2
     transitivePeerDependencies:
       - supports-color
 
-  '@opentelemetry/instrumentation@0.205.0(@opentelemetry/api@1.9.0)':
+  '@opentelemetry/instrumentation@0.208.0(@opentelemetry/api@1.9.0)':
     dependencies:
       '@opentelemetry/api': 1.9.0
-      '@opentelemetry/api-logs': 0.205.0
-      import-in-the-middle: 1.15.0
-      require-in-the-middle: 7.5.2
+      '@opentelemetry/api-logs': 0.208.0
+      import-in-the-middle: 2.0.6
+      require-in-the-middle: 8.0.1
     transitivePeerDependencies:
       - supports-color
 
@@ -1243,7 +1213,7 @@ snapshots:
 
   caniuse-lite@1.0.30001757: {}
 
-  cjs-module-lexer@1.4.3: {}
+  cjs-module-lexer@2.2.0: {}
 
   color-convert@2.0.1:
     dependencies:
@@ -1267,7 +1237,7 @@ snapshots:
     dependencies:
       ms: 2.1.3
 
-  dedent@1.7.0: {}
+  dedent@1.7.1: {}
 
   delayed-stream@1.0.0: {}
 
@@ -1306,9 +1276,9 @@ snapshots:
 
   fast-safe-stringify@2.1.1: {}
 
-  fast-xml-parser@5.3.2:
+  fast-xml-parser@5.3.6:
     dependencies:
-      strnum: 2.1.1
+      strnum: 2.1.2
 
   follow-redirects@1.15.11: {}
 
@@ -1381,16 +1351,12 @@ snapshots:
 
   ieee754@1.2.1: {}
 
-  import-in-the-middle@1.15.0:
+  import-in-the-middle@2.0.6:
     dependencies:
       acorn: 8.15.0
       acorn-import-attributes: 1.9.5(acorn@8.15.0)
-      cjs-module-lexer: 1.4.3
+      cjs-module-lexer: 2.2.0
       module-details-from-path: 1.0.4
-
-  is-core-module@2.16.1:
-    dependencies:
-      hasown: 2.0.2
 
   is-fullwidth-code-point@3.0.0: {}
 
@@ -1410,7 +1376,7 @@ snapshots:
 
   jsonrepair@3.13.1: {}
 
-  llmz@0.0.33(@botpress/client@1.27.2)(@botpress/cognitive@0.2.1)(@bpinternal/thicktoken@1.0.6)(@bpinternal/zui@1.2.2):
+  llmz@0.0.37(@botpress/client@1.35.0)(@botpress/cognitive@0.3.14)(@bpinternal/thicktoken@1.0.6)(@bpinternal/zui@1.3.3):
     dependencies:
       '@babel/core': 7.28.5
       '@babel/generator': 7.28.5
@@ -1420,9 +1386,9 @@ snapshots:
       '@babel/standalone': 7.28.5
       '@babel/traverse': 7.28.5
       '@babel/types': 7.28.5
-      '@botpress/cognitive': 0.2.1
+      '@botpress/cognitive': 0.3.14
       '@bpinternal/thicktoken': 1.0.6
-      '@bpinternal/zui': 1.2.2
+      '@bpinternal/zui': 1.3.3
       '@jitl/quickjs-singlefile-browser-release-sync': 0.31.0
       bytes: 3.1.2
       exponential-backoff: 3.1.3
@@ -1434,7 +1400,7 @@ snapshots:
       quickjs-emscripten-core: 0.31.0
       ulid: 2.4.0
     optionalDependencies:
-      '@botpress/client': 1.27.2
+      '@botpress/client': 1.35.0
     transitivePeerDependencies:
       - supports-color
 
@@ -1488,8 +1454,6 @@ snapshots:
 
   path-key@3.1.1: {}
 
-  path-parse@1.0.7: {}
-
   path-scurry@2.0.1:
     dependencies:
       lru-cache: 11.2.2
@@ -1511,19 +1475,12 @@ snapshots:
     dependencies:
       '@jitl/quickjs-ffi-types': 0.31.0
 
-  require-in-the-middle@7.5.2:
+  require-in-the-middle@8.0.1:
     dependencies:
       debug: 4.4.3
       module-details-from-path: 1.0.4
-      resolve: 1.22.11
     transitivePeerDependencies:
       - supports-color
-
-  resolve@1.22.11:
-    dependencies:
-      is-core-module: 2.16.1
-      path-parse: 1.0.7
-      supports-preserve-symlinks-flag: 1.0.0
 
   semver@6.3.1: {}
 
@@ -1587,9 +1544,7 @@ snapshots:
     dependencies:
       ansi-regex: 6.2.2
 
-  strnum@2.1.1: {}
-
-  supports-preserve-symlinks-flag@1.0.0: {}
+  strnum@2.1.2: {}
 
   typescript@5.9.3: {}
 
@@ -1598,7 +1553,7 @@ snapshots:
 
   ulid@2.4.0: {}
 
-  ulid@3.0.1: {}
+  ulid@3.0.2: {}
 
   undici@7.16.0: {}
 
@@ -1629,3 +1584,5 @@ snapshots:
   yallist@3.1.1: {}
 
   yocto-queue@1.2.2: {}
+
+  zod@3.25.76: {}
