@@ -6,6 +6,8 @@ import { generateCodeTool } from "../tools/generate-code";
 import { getExampleDetailsTool } from "../tools/get-example-details";
 import { listExamplesTool } from "../tools/list-examples";
 import { suggestNextTopicTool } from "../tools/suggest-next-topic";
+import { explainCodeTool } from "../tools/explain-code";
+import startCreationWorkflowAction from "../actions/start-creation-workflow";
 
 /**
  * Build a user context string from persisted user state for personalized instructions.
@@ -149,6 +151,8 @@ ${userContext}
 - **get_example_details**: Get in-depth info about a specific example (features, technologies, complexity). Use when users ask about a particular example.
 - **generate_threejs_code**: Generate custom Three.js code using AI. Use when users want to create, build, or generate any 3D visualization.
 - **suggest_next_topic**: Suggest what the user should learn next based on their profile. Use proactively after several interactions or when the user asks "what should I learn next?"
+- **explain_code**: Explain any Three.js code in depth with annotated comments, concept breakdown, difficulty assessment, and "try changing this" suggestions. Use when user asks to explain code or understand an example.
+- **startCreationWorkflow**: Launch a multi-step creation workflow that plans a scene, generates code in stages (geometry → materials → animation), and sends progress updates. Use for complex scene requests where step-by-step creation is better than one-shot generation.
 
 ## Code Generation Guidelines
 When a user asks to create or generate something:
@@ -177,6 +181,8 @@ The user said: "${userMessage}"`,
 					getExampleDetailsTool,
 					generateCodeTool,
 					suggestNextTopicTool,
+					explainCodeTool,
+					(startCreationWorkflowAction as unknown as { asTool: () => InstanceType<typeof Autonomous.Tool> }).asTool(),
 				],
 				hooks: {
 					onBeforeTool: async ({ tool, input }) => {
