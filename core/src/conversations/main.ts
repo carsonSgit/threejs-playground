@@ -1,8 +1,11 @@
-import { Conversation, user, z } from "@botpress/runtime";
+import { Autonomous, adk, Conversation, user, z } from "@botpress/runtime";
 import playgroundDocs from "../knowledge/playground-docs";
+import { shaderResources } from "../knowledge/shader-resources";
+import { threejsDocs } from "../knowledge/threejs-docs";
 import { generateCodeTool } from "../tools/generate-code";
 import { getExampleDetailsTool } from "../tools/get-example-details";
 import { listExamplesTool } from "../tools/list-examples";
+import { suggestNextTopicTool } from "../tools/suggest-next-topic";
 
 /**
  * Build a user context string from persisted user state for personalized instructions.
@@ -31,7 +34,77 @@ function buildUserContext(): string {
 		parts.push(`Favorite examples: ${favorites.join(", ")}`);
 	}
 
+	// Include skill levels if available
+	const state = user.state as Record<string, unknown>;
+	const skillLevels = state.skillLevels as
+		| Record<string, number | undefined>
+		| undefined;
+	if (skillLevels) {
+		const skills = Object.entries(skillLevels)
+			.filter(([, v]) => v !== undefined && v !== null)
+			.map(([k, v]) => `${k}: ${v}/5`);
+		if (skills.length > 0) {
+			parts.push(`Skill levels: ${skills.join(", ")}`);
+		}
+	}
+
+	const totalGenerations = state.totalGenerations as number | undefined;
+	if (totalGenerations && totalGenerations > 0) {
+		parts.push(`Total code generations: ${totalGenerations}`);
+	}
+
 	return parts.length > 0 ? parts.join("\n") : "New user (no history yet)";
+}
+
+/**
+ * Per-tool timing map. Populated in onBeforeTool, consumed in onAfterTool.
+ */
+const toolTimings = new Map<string, number>();
+
+/**
+ * Run Zai quality checks on generated Three.js code.
+ * Returns issues found, or empty array if code looks good.
+ */
+async function analyzeCodeQuality(
+	code: string,
+): Promise<{ label: string; passed: boolean; note: string }[]> {
+	const results: { label: string; passed: boolean; note: string }[] = [];
+
+	try {
+		const disposalCheck = await adk.zai.check(
+			code,
+			"properly disposes of Three.js resources (geometry, material, renderer) in cleanup or unmount",
+		);
+		const disposalPassed = Boolean(disposalCheck);
+		results.push({
+			label: "resourceDisposal",
+			passed: disposalPassed,
+			note: disposalPassed
+				? "Resources cleaned up"
+				: "Missing dispose() calls for geometry/material/renderer",
+		});
+	} catch (e) {
+		console.warn("[Quality] disposal check failed:", e);
+	}
+
+	try {
+		const perfCheck = await adk.zai.check(
+			code,
+			"avoids common Three.js performance pitfalls like creating objects in the animation loop, unnecessary cloning, or missing requestAnimationFrame cleanup",
+		);
+		const perfPassed = Boolean(perfCheck);
+		results.push({
+			label: "performance",
+			passed: perfPassed,
+			note: perfPassed
+				? "No obvious performance issues"
+				: "Potential performance issue detected",
+		});
+	} catch (e) {
+		console.warn("[Quality] perf check failed:", e);
+	}
+
+	return results;
 }
 
 export default new Conversation({
@@ -48,6 +121,11 @@ export default new Conversation({
 		}
 
 		state.messageCount = (state.messageCount || 0) + 1;
+
+		// Increment total generations counter on each message
+		const stateRef = user.state as Record<string, unknown>;
+		const prevTotal = (stateRef.totalGenerations as number) || 0;
+		stateRef.totalGenerations = prevTotal + 1;
 
 		await conversation.startTyping();
 
@@ -70,6 +148,7 @@ ${userContext}
 - **list_examples**: Browse the playground's example gallery. Use when users want to explore, browse, or discover examples.
 - **get_example_details**: Get in-depth info about a specific example (features, technologies, complexity). Use when users ask about a particular example.
 - **generate_threejs_code**: Generate custom Three.js code using AI. Use when users want to create, build, or generate any 3D visualization.
+- **suggest_next_topic**: Suggest what the user should learn next based on their profile. Use proactively after several interactions or when the user asks "what should I learn next?"
 
 ## Code Generation Guidelines
 When a user asks to create or generate something:
@@ -92,22 +171,93 @@ Aim for visually stunning, creative results. Avoid generic "rotating cube" examp
 - After showing example details, suggest what the user might try next
 
 The user said: "${userMessage}"`,
-				knowledge: [playgroundDocs],
-				tools: [listExamplesTool, getExampleDetailsTool, generateCodeTool],
+				knowledge: [playgroundDocs, threejsDocs, shaderResources],
+				tools: [
+					listExamplesTool,
+					getExampleDetailsTool,
+					generateCodeTool,
+					suggestNextTopicTool,
+				],
 				hooks: {
 					onBeforeTool: async ({ tool, input }) => {
-						console.log(`[Tool Call] ${tool.name}`, JSON.stringify(input));
-					},
-					onAfterTool: async ({ tool, output }) => {
+						const startTime = Date.now();
+						toolTimings.set(tool.name, startTime);
 						console.log(
-							`[Tool Result] ${tool.name}`,
-							typeof output === "object"
-								? JSON.stringify(output).slice(0, 200)
-								: output,
+							JSON.stringify({
+								event: "tool_start",
+								tool: tool.name,
+								input:
+									typeof input === "object"
+										? JSON.stringify(input).slice(0, 300)
+										: String(input).slice(0, 300),
+								timestamp: new Date(startTime).toISOString(),
+							}),
 						);
 					},
+					onAfterTool: async ({ tool, output }) => {
+						const startTime = toolTimings.get(tool.name);
+						const duration = startTime ? Date.now() - startTime : -1;
+						toolTimings.delete(tool.name);
+
+						const outputSummary =
+							typeof output === "object"
+								? JSON.stringify(output).slice(0, 300)
+								: String(output).slice(0, 300);
+
+						console.log(
+							JSON.stringify({
+								event: "tool_end",
+								tool: tool.name,
+								durationMs: duration,
+								outputPreview: outputSummary,
+								timestamp: new Date().toISOString(),
+							}),
+						);
+
+						// Run Zai quality analysis on generated code
+						if (
+							tool.name === "generate_threejs_code" &&
+							output &&
+							typeof output === "object"
+						) {
+							const result = output as { success?: boolean; code?: string };
+							if (result.success && result.code) {
+								const qualityResults = await analyzeCodeQuality(result.code);
+								const issues = qualityResults.filter((r) => !r.passed);
+
+								console.log(
+									JSON.stringify({
+										event: "code_quality",
+										tool: tool.name,
+										checks: qualityResults.length,
+										issues: issues.length,
+										details: qualityResults,
+										timestamp: new Date().toISOString(),
+									}),
+								);
+
+								// If critical issues found, signal the AI to mention them
+								if (issues.length > 0) {
+									const issueNotes = issues
+										.map((i) => `- ${i.label}: ${i.note}`)
+										.join("\n");
+									throw new Autonomous.ThinkSignal(
+										"Code quality concerns detected",
+										`The generated code has potential issues:\n${issueNotes}\n\nConsider mentioning these to the user and suggesting improvements.`,
+									);
+								}
+							}
+						}
+					},
 					onTrace: ({ trace, iteration }) => {
-						console.log(`[Trace] iteration=${iteration} type=${trace.type}`);
+						console.log(
+							JSON.stringify({
+								event: "trace",
+								iteration,
+								traceType: trace.type,
+								timestamp: new Date().toISOString(),
+							}),
+						);
 					},
 				},
 			});

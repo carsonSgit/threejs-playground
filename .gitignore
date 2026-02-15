@@ -49,3 +49,7 @@ core/.adk/
 core/node_modules/
 # clerk configuration (can include secrets)
 /.clerk/
+
+.claude/
+.agents/
+.cursor/

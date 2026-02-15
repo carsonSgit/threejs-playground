@@ -11,8 +11,8 @@ declare module "@botpress/zai" {
 	import type { z } from "@botpress/sdk";
 
 	interface TextOptions {
-		/** Target length in tokens */
-		length?: number;
+		/** Target length — preset name or token count */
+		length?: "short" | "medium" | "long" | number;
 		/** Creativity (0-1) */
 		temperature?: number;
 		/** Optional stop markers */
