@@ -31,6 +31,20 @@ export default defineConfig({
 				.optional(),
 		}),
 	},
+	events: {
+		codeSampleGenerated: {
+			description: "Triggered when AI generates a new Three.js code sample",
+			schema: z.object({
+				sampleId: z.string(),
+				title: z.string(),
+				code: z.string(),
+				concept: z.string(),
+				explanation: z.string(),
+				complexity: z.enum(["beginner", "intermediate", "advanced"]),
+				userId: z.string().optional(),
+			}),
+		},
+	},
 	dependencies: {
 		integrations: {
 			webchat: { version: "webchat@0.3.0", enabled: true },

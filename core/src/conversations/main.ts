@@ -4,31 +4,12 @@ import getExampleDetailsAction from "../actions/get-example-details";
 import listExamplesAction from "../actions/list-examples";
 import playgroundDocs from "../knowledge/playground-docs";
 
-interface MessagePayload {
-	type: string;
-	payload?: {
-		text?: string;
-	};
-}
-
-interface HandlerParams {
-	message: MessagePayload;
-	execute: (params: {
-		instructions: string;
-		knowledge: unknown[];
-		tools: Autonomous.Tool[];
-	}) => Promise<void>;
-	state: {
-		lastExampleViewed?: string;
-	};
-}
-
 export default new Conversation({
 	channel: "*",
 	state: z.object({
 		lastExampleViewed: z.string().optional(),
 	}),
-	async handler({ message, execute, state }: HandlerParams) {
+	async handler({ message, execute, state }) {
 		if (message?.type !== "text") {
 			return;
 		}
