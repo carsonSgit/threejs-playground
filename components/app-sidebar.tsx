@@ -101,9 +101,11 @@ function SidebarInner({
 	useEffect(() => {
 		let unsubscribeError: (() => void) | null = null;
 		let checkInterval: NodeJS.Timeout | null = null;
+		let timeoutId: NodeJS.Timeout | null = null;
+		let isMounted = true;
 
 		const setupListeners = () => {
-			if (window.botpress) {
+			if (window.botpress && isMounted) {
 				setBotpressStatus("ready");
 				setHasQuotaError(false);
 
@@ -124,12 +126,13 @@ function SidebarInner({
 				if (window.botpress) {
 					setupListeners();
 					if (checkInterval) clearInterval(checkInterval);
+					if (timeoutId) clearTimeout(timeoutId);
 				}
 			}, 100);
 
-			setTimeout(() => {
+			timeoutId = setTimeout(() => {
 				if (checkInterval) clearInterval(checkInterval);
-				if (!window.botpress && botpressStatus === "loading") {
+				if (!window.botpress && isMounted) {
 					setBotpressStatus("error");
 					setHasQuotaError(true);
 				}
@@ -137,10 +140,12 @@ function SidebarInner({
 		}
 
 		return () => {
+			isMounted = false;
 			if (unsubscribeError) unsubscribeError();
 			if (checkInterval) clearInterval(checkInterval);
+			if (timeoutId) clearTimeout(timeoutId);
 		};
-	}, [botpressStatus]);
+	}, []);
 
 	const toggleChat = () => {
 		if (window.botpress && !hasQuotaError) {
@@ -348,24 +353,24 @@ function SidebarInner({
 					</SidebarGroup>
 				</SignedIn>
 				<SignedOut>
-					<SidebarGroup className="gap-3 group-data-[collapsible=icon]:hidden">
-						<div className="flex flex-col gap-2">
-							<h3 className="text-sm font-semibold text-sidebar-foreground">
-								Get Started
+					<SidebarGroup className="gap-3 group-data-[collapsible=icon]:hidden font-mono">
+						<div className="flex flex-col gap-2 px-2">
+							<h3 className="text-xs font-semibold text-sidebar-foreground flex items-center gap-2">
+								<span className="text-primary/50">{">"}</span> auth_required
 							</h3>
-							<p className="text-xs text-sidebar-foreground/70 leading-relaxed">
-								Create an account to access all features and save your progress.
+							<p className="text-[10px] text-sidebar-foreground/60 leading-relaxed border-l border-border/50 pl-2 ml-1">
+								create an account to access features and save progress.
 							</p>
 						</div>
-						<div className="flex gap-2">
+						<div className="flex flex-col gap-2">
 							<SignInButton mode="modal">
-								<Button className="w-full bg-border/80 hover:bg-border/60 text-white font-medium transition-all">
-									Sign In
+								<Button variant="outline" className="w-full text-xs font-mono justify-start border-border/50 hover:bg-sidebar-accent hover:text-sidebar-accent-foreground transition-all h-8">
+									<span className="text-sidebar-foreground/40 mr-2">[1]</span> sign_in
 								</Button>
 							</SignInButton>
 							<SignUpButton mode="modal">
-								<Button className="w-full bg-card/80 hover:bg-card/60 text-white font-medium transition-all">
-									Sign Up
+								<Button variant="outline" className="w-full text-xs font-mono justify-start border-border/50 hover:bg-sidebar-accent hover:text-sidebar-accent-foreground transition-all h-8">
+									<span className="text-sidebar-foreground/40 mr-2">[2]</span> create_account
 								</Button>
 							</SignUpButton>
 						</div>
@@ -373,10 +378,11 @@ function SidebarInner({
 					<SidebarGroup className="group-data-[collapsible=icon]:flex group-data-[collapsible=icon]:justify-center hidden">
 						<SignUpButton mode="modal">
 							<Button
+								variant="ghost"
 								size="icon"
-								className="bg-card/80 hover:bg-card/60 text-white font-medium transition-all"
+								className="h-8 w-8 text-sidebar-foreground/60 hover:text-sidebar-foreground hover:bg-sidebar-accent transition-all font-mono text-xs"
 							>
-								<span className="text-sm font-medium">+</span>
+								{">_"}
 							</Button>
 						</SignUpButton>
 					</SidebarGroup>
