@@ -17,7 +17,7 @@ export default function RootLayout({
 	return (
 		<ClerkProvider>
 			<html lang="en" className="dark" suppressHydrationWarning>
-				<body>
+				<body className="relative isolate min-h-screen">
 					<SidebarWrapper>{children}</SidebarWrapper>
 					{/* Hidden toggle for Botpress */}
 					<div id="bp-toggle-chat" style={{ display: "none" }} />

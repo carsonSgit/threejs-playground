@@ -5,8 +5,8 @@ import { ExampleCard } from "@/components/example-card";
 export default function Home() {
 	return (
 		<>
-			<section id="examples" className="bg-background py-24">
-				<div className="container">
+			<section id="examples" className="bg-background py-24 px-6 md:px-12">
+				<div className="container mx-auto">
 					<div className="mb-16 space-y-4">
 						<div className="flex items-center gap-4 mb-8">
 							<h2 className="text-3xl md:text-4xl font-bold font-mono tracking-tight text-foreground">

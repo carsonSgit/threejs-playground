@@ -1,12 +1,181 @@
 "use client";
 
 import { useUser } from "@clerk/nextjs";
-import { Code2, Pencil, Play, Plus, Trash2 } from "lucide-react";
+import { Dialog } from "@base-ui/react/dialog";
+import { Tooltip } from "@base-ui/react/tooltip";
+import {
+	Code2,
+	Pencil,
+	Play,
+	Plus,
+	Save,
+	TerminalSquare,
+	Trash2,
+	Box,
+	Sparkles,
+	Droplets,
+	LayoutGrid,
+} from "lucide-react";
 import { useCallback, useEffect, useRef, useState } from "react";
+import Editor from "react-simple-code-editor";
+import Prism from "prismjs";
+import "prismjs/components/prism-clike";
+import "prismjs/components/prism-javascript";
+import "prismjs/components/prism-typescript";
+import "prismjs/themes/prism-tomorrow.css"; // Dark theme for syntax highlighting
 import type { CodeSample } from "@/app/api/code-samples/route";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { ScrollArea } from "@/components/ui/scroll-area";
+
+const TEMPLATES = [
+	{
+		id: "tpl_basic",
+		title: "Basic Cube",
+		icon: (
+			<Box className="w-10 h-10 text-cyan-400 group-hover:scale-110 transition-transform" />
+		),
+		description:
+			"A minimal rotating cube setup. Perfect for understanding the Three.js camera, scene, and render loop fundamentals.",
+		code: `import * as THREE from "three";
+
+// Scene setup
+const scene = new THREE.Scene();
+const camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, 1000);
+const renderer = new THREE.WebGLRenderer({ antialias: true });
+renderer.setSize(window.innerWidth, window.innerHeight);
+document.body.appendChild(renderer.domElement);
+
+// Create a Cube
+const geometry = new THREE.BoxGeometry(1, 1, 1);
+const material = new THREE.MeshBasicMaterial({ 
+    color: 0x06b6d4,
+    wireframe: true 
+});
+const cube = new THREE.Mesh(geometry, material);
+scene.add(cube);
+
+camera.position.z = 5;
+
+// Animation Loop
+function animate() {
+    requestAnimationFrame(animate);
+    cube.rotation.x += 0.01;
+    cube.rotation.y += 0.01;
+    renderer.render(scene, camera);
+}
+
+animate();
+
+// Handle Resize
+window.addEventListener('resize', () => {
+    camera.aspect = window.innerWidth / window.innerHeight;
+    camera.updateProjectionMatrix();
+    renderer.setSize(window.innerWidth, window.innerHeight);
+});`,
+	},
+	{
+		id: "tpl_particles",
+		title: "Particle Field",
+		icon: (
+			<Sparkles className="w-10 h-10 text-fuchsia-400 group-hover:scale-110 transition-transform" />
+		),
+		description:
+			"A high-performance particle system using BufferGeometry and PointsMaterial to render thousands of stars.",
+		code: `import * as THREE from "three";
+
+const scene = new THREE.Scene();
+const camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, 1000);
+const renderer = new THREE.WebGLRenderer({ antialias: true });
+renderer.setSize(window.innerWidth, window.innerHeight);
+document.body.appendChild(renderer.domElement);
+
+// Particle Setup
+const particleCount = 2000;
+const geometry = new THREE.BufferGeometry();
+const positions = new Float32Array(particleCount * 3);
+
+for(let i = 0; i < particleCount * 3; i++) {
+    positions[i] = (Math.random() - 0.5) * 10;
+}
+
+geometry.setAttribute('position', new THREE.BufferAttribute(positions, 3));
+
+const material = new THREE.PointsMaterial({
+    color: 0xe879f9,
+    size: 0.05,
+    transparent: true,
+    opacity: 0.8
+});
+
+const particles = new THREE.Points(geometry, material);
+scene.add(particles);
+camera.position.z = 5;
+
+function animate() {
+    requestAnimationFrame(animate);
+    particles.rotation.y += 0.002;
+    particles.rotation.x += 0.001;
+    renderer.render(scene, camera);
+}
+animate();`,
+	},
+	{
+		id: "tpl_shader",
+		title: "Liquid Shader",
+		icon: (
+			<Droplets className="w-10 h-10 text-blue-400 group-hover:scale-110 transition-transform" />
+		),
+		description:
+			"A custom GLSL ShaderMaterial that generates a morphing, liquid-like surface using time uniforms.",
+		code: `import * as THREE from "three";
+
+const scene = new THREE.Scene();
+const camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, 1000);
+const renderer = new THREE.WebGLRenderer({ antialias: true });
+renderer.setSize(window.innerWidth, window.innerHeight);
+document.body.appendChild(renderer.domElement);
+
+// Shader Material
+const uniforms = {
+    u_time: { value: 0.0 }
+};
+
+const material = new THREE.ShaderMaterial({
+    uniforms: uniforms,
+    vertexShader: \`
+        varying vec2 vUv;
+        void main() {
+            vUv = uv;
+            gl_Position = projectionMatrix * modelViewMatrix * vec4(position, 1.0);
+        }
+    \`,
+    fragmentShader: \`
+        uniform float u_time;
+        varying vec2 vUv;
+        void main() {
+            vec2 p = vUv * 2.0 - 1.0;
+            float d = length(p);
+            vec3 col = vec3(0.1, 0.4, 0.8) + vec3(0.2, 0.5, 0.9) * sin(d * 10.0 - u_time * 2.0);
+            gl_FragColor = vec4(col, 1.0);
+        }
+    \`
+});
+
+const geometry = new THREE.PlaneGeometry(5, 5);
+const plane = new THREE.Mesh(geometry, material);
+scene.add(plane);
+camera.position.z = 3;
+
+const clock = new THREE.Clock();
+
+function animate() {
+    requestAnimationFrame(animate);
+    uniforms.u_time.value = clock.getElapsedTime();
+    renderer.render(scene, camera);
+}
+animate();`,
+	},
+];
 
 export default function CodeSandboxPage() {
 	const { user } = useUser();
@@ -17,7 +186,12 @@ export default function CodeSandboxPage() {
 	const [iframeKey, setIframeKey] = useState(0);
 	const [editingId, setEditingId] = useState<string | null>(null);
 	const [editTitle, setEditTitle] = useState("");
-	const textareaRef = useRef<HTMLTextAreaElement>(null);
+	const [isCompiling, setIsCompiling] = useState(false);
+
+	// App Modes
+	const [viewMode, setViewMode] = useState<"gallery" | "editor">("gallery");
+	const [itemToDelete, setItemToDelete] = useState<string | null>(null);
+
 	const lastSelectedSampleIdRef = useRef<string | null>(null);
 	const isFetchingRef = useRef(false);
 	const selectedSampleRef = useRef<CodeSample | null>(null);
@@ -40,9 +214,7 @@ export default function CodeSandboxPage() {
 			const currentSelected = selectedSampleRef.current;
 
 			if (fetchedSamples.length > 0) {
-				if (!currentSelected) {
-					setSelectedSample(fetchedSamples[0]);
-				} else if (preserveSelection && currentSelected) {
+				if (preserveSelection && currentSelected) {
 					const stillExists = fetchedSamples.find(
 						(s: CodeSample) => s.id === currentSelected.id,
 					);
@@ -50,8 +222,6 @@ export default function CodeSandboxPage() {
 						setSelectedSample(fetchedSamples[0]);
 					}
 				}
-			} else {
-				setSelectedSample(null);
 			}
 		} catch (error) {
 			console.error("Failed to fetch samples:", error);
@@ -62,11 +232,10 @@ export default function CodeSandboxPage() {
 	}, []);
 
 	useEffect(() => {
-		fetchSamples(false); // Initial load - don't preserve selection
+		fetchSamples(false);
 
-		// Listen for code sample saved events
 		const handleSampleSaved = () => {
-			setTimeout(() => fetchSamples(true), 500); // Small delay to ensure API has processed
+			setTimeout(() => fetchSamples(true), 500);
 		};
 
 		window.addEventListener("code-sample-saved", handleSampleSaved);
@@ -83,20 +252,16 @@ export default function CodeSandboxPage() {
 		) {
 			setCode(selectedSample.code);
 			lastSelectedSampleIdRef.current = selectedSample.id;
+			setIsCompiling(true);
+			setTimeout(() => setIsCompiling(false), 300);
+			setViewMode("editor");
 		} else if (!selectedSample) {
 			setCode("");
 			lastSelectedSampleIdRef.current = null;
+			// If no sample is selected, show the gallery
+			setViewMode("gallery");
 		}
 	}, [selectedSample]);
-
-	// biome-ignore lint/correctness/useExhaustiveDependencies: code is required for the effect to run on content change, even if not read directly
-	useEffect(() => {
-		// Auto-resize textarea when code changes
-		if (textareaRef.current) {
-			textareaRef.current.style.height = "auto";
-			textareaRef.current.style.height = `${textareaRef.current.scrollHeight}px`;
-		}
-	}, [code]);
 
 	const startEditing = (sample: CodeSample) => {
 		setEditingId(sample.id);
@@ -109,7 +274,6 @@ export default function CodeSandboxPage() {
 		const currentEditingId = editingId;
 		const currentEditTitle = editTitle.trim();
 
-		// Optimistically update UI
 		setEditingId(null);
 
 		if (!currentEditTitle) return;
@@ -137,7 +301,6 @@ export default function CodeSandboxPage() {
 			});
 		} catch (error) {
 			console.error("Failed to rename sample:", error);
-			// Revert on error
 			setSamples(samples.map((s) => (s.id === currentEditingId ? sample : s)));
 			if (selectedSample?.id === currentEditingId) {
 				setSelectedSample(sample);
@@ -145,7 +308,11 @@ export default function CodeSandboxPage() {
 		}
 	};
 
-	const handleDelete = async (sampleId: string) => {
+	const executeDelete = async () => {
+		if (!itemToDelete) return;
+		const sampleId = itemToDelete;
+		setItemToDelete(null);
+
 		try {
 			await fetch(`/api/code-samples?id=${sampleId}`, {
 				method: "DELETE",
@@ -153,7 +320,12 @@ export default function CodeSandboxPage() {
 			setSamples(samples.filter((s) => s.id !== sampleId));
 			if (selectedSample?.id === sampleId) {
 				const remaining = samples.filter((s) => s.id !== sampleId);
-				setSelectedSample(remaining.length > 0 ? remaining[0] : null);
+				if (remaining.length > 0) {
+					setSelectedSample(remaining[0]);
+				} else {
+					setSelectedSample(null);
+					setViewMode("gallery");
+				}
 			}
 		} catch (error) {
 			console.error("Failed to delete sample:", error);
@@ -161,11 +333,19 @@ export default function CodeSandboxPage() {
 	};
 
 	const handleRun = () => {
+		setIsCompiling(true);
 		setIframeKey((prev) => prev + 1);
+		setTimeout(() => setIsCompiling(false), 500);
 	};
 
 	const handleSave = async () => {
 		if (!selectedSample) return;
+
+		const originalCode = selectedSample.code;
+		setSamples(
+			samples.map((s) => (s.id === selectedSample.id ? { ...s, code } : s)),
+		);
+		setSelectedSample({ ...selectedSample, code });
 
 		try {
 			await fetch("/api/code-samples", {
@@ -177,55 +357,24 @@ export default function CodeSandboxPage() {
 					sampleId: selectedSample.id,
 				}),
 			});
-			setSamples(
-				samples.map((s) => (s.id === selectedSample.id ? { ...s, code } : s)),
-			);
-			setSelectedSample({ ...selectedSample, code });
-			lastSelectedSampleIdRef.current = selectedSample.id; // Update ref to prevent overwrite
+			lastSelectedSampleIdRef.current = selectedSample.id;
 		} catch (error) {
 			console.error("Failed to save:", error);
+			setSamples(
+				samples.map((s) =>
+					s.id === selectedSample.id ? { ...s, code: originalCode } : s,
+				),
+			);
+			setSelectedSample({ ...selectedSample, code: originalCode });
+			setCode(originalCode);
 		}
 	};
 
-	const defaultCode = `import * as THREE from "three";
-
-// Your Three.js code here
-const scene = new THREE.Scene();
-const camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, 1000);
-const renderer = new THREE.WebGLRenderer({ antialias: true });
-renderer.setSize(window.innerWidth, window.innerHeight);
-document.body.appendChild(renderer.domElement);
-
-const geometry = new THREE.BoxGeometry(1, 1, 1);
-const material = new THREE.MeshBasicMaterial({ color: 0x00ff00 });
-const cube = new THREE.Mesh(geometry, material);
-scene.add(cube);
-
-camera.position.z = 5;
-
-function animate() {
-    requestAnimationFrame(animate);
-    cube.rotation.x += 0.01;
-    cube.rotation.y += 0.01;
-    renderer.render(scene, camera);
-}
-
-animate();
-
-window.addEventListener('resize', () => {
-    camera.aspect = window.innerWidth / window.innerHeight;
-    camera.updateProjectionMatrix();
-    renderer.setSize(window.innerWidth, window.innerHeight);
-});`;
-
-	const handleNewSample = async (e?: React.MouseEvent) => {
-		e?.preventDefault();
-		e?.stopPropagation();
-
+	const handleNewFromTemplate = async (templateCode: string, title: string) => {
 		const newSample: CodeSample = {
 			id: `sample_${Date.now()}_${Math.random().toString(36).substring(7)}`,
-			title: "New Code Sample",
-			code: defaultCode,
+			title: `${title}_${Math.floor(Math.random() * 1000)}`,
+			code: templateCode,
 			language: "typescript",
 			concept: "",
 			explanation: "",
@@ -235,6 +384,7 @@ window.addEventListener('resize', () => {
 
 		setSamples([...samples, newSample]);
 		setSelectedSample(newSample);
+		setViewMode("editor");
 
 		try {
 			await fetch("/api/code-samples", {
@@ -244,10 +394,6 @@ window.addEventListener('resize', () => {
 			});
 		} catch (error) {
 			console.error("Failed to create new sample:", error);
-			setSamples(samples);
-			if (selectedSample) {
-				setSelectedSample(selectedSample);
-			}
 		}
 	};
 
@@ -256,7 +402,7 @@ window.addEventListener('resize', () => {
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Code Sandbox</title>
+    <title>Preview</title>
     <script type="importmap">
     {
         "imports": {
@@ -279,145 +425,192 @@ ${codeContent}
 
 	if (loading) {
 		return (
-			<div className="min-h-screen bg-background flex items-center justify-center">
-				<div className="text-muted-foreground font-mono">loading...</div>
+			<div className="h-screen w-full bg-background flex flex-col items-center justify-center space-y-4">
+				<div className="w-16 h-16 relative">
+					<div className="absolute inset-0 border-t-2 border-primary/50 rounded-full animate-spin"></div>
+					<div className="absolute inset-2 border-r-2 border-primary/30 rounded-full animate-spin-reverse"></div>
+				</div>
+				<div className="text-muted-foreground font-mono text-xs animate-pulse">
+					initializing_workspace...
+				</div>
 			</div>
 		);
 	}
 
 	return (
-		<div className="h-screen bg-background flex flex-col overflow-hidden">
-			{/* Header */}
-			<header>
-				<div className="mx-4 py-4">
-					<div className="flex items-center justify-between w-full">
-						<div className="flex-shrink-0">
-							<h1 className="text-2xl font-bold font-mono tracking-tight">
-								code_sandbox
+		<div className="h-screen bg-background flex flex-col overflow-hidden text-foreground">
+			<Dialog.Root
+				open={!!itemToDelete}
+				onOpenChange={(open) => !open && setItemToDelete(null)}
+			>
+				<Dialog.Portal>
+					<Dialog.Backdrop className="fixed inset-0 bg-black/80 backdrop-blur-sm z-[9998] transition-opacity" />
+					<Dialog.Popup className="fixed left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 bg-background border border-border/50 shadow-2xl p-6 max-w-sm w-full font-mono outline-none z-[9999]">
+						<h2 className="text-sm font-bold text-red-400 mb-2 tracking-widest uppercase">
+							Delete_Sketch?
+						</h2>
+						<p className="text-xs text-muted-foreground mb-6 leading-relaxed">
+							This action is permanent and cannot be undone. Are you absolutely
+							sure?
+						</p>
+						<div className="flex justify-end gap-3">
+							<Dialog.Close
+								render={
+									<Button variant="ghost" size="sm" className="font-mono text-xs" />
+								}
+							>
+								[Cancel]
+							</Dialog.Close>
+							<Button
+								variant="outline"
+								size="sm"
+								className="font-mono text-xs border-red-500/30 text-red-400 hover:bg-red-500/10 hover:text-red-300"
+								onClick={executeDelete}
+							>
+								[Confirm_Delete]
+							</Button>
+						</div>
+					</Dialog.Popup>
+				</Dialog.Portal>
+			</Dialog.Root>
+
+			<header className="h-14 border-b border-border bg-black/40 flex items-center px-4 shrink-0 backdrop-blur-md z-10">
+				<div className="flex items-center gap-3 w-full">
+					<TerminalSquare className="h-5 w-5 text-primary/70 shrink-0" />
+					<div className="flex-1 min-w-0 flex items-center gap-4">
+						<div>
+							<h1 className="text-sm font-bold font-mono tracking-tight text-primary/90 truncate">
+								~/sandbox
 							</h1>
-							<p className="text-xs text-muted-foreground font-mono mt-1">
-								run and modify your code samples
+							<p className="text-[10px] text-muted-foreground font-mono truncate hidden sm:block">
+								webgl_experimentation_environment
 							</p>
 						</div>
-						<div className="flex items-center gap-2 flex-shrink-0 ml-auto">
+					</div>
+					<div className="shrink-0">
+						{viewMode === "editor" && (
 							<Button
-								onClick={(e) => handleNewSample(e)}
-								type="button"
-								variant="outline"
+								variant="ghost"
 								size="sm"
-								className="font-mono text-xs"
+								className="text-xs font-mono text-muted-foreground hover:text-foreground"
+								onClick={() => {
+									setSelectedSample(null);
+									setViewMode("gallery");
+								}}
 							>
-								<Plus className="h-3 w-3 mr-2" />
-								new
+								<LayoutGrid className="h-4 w-4 mr-2" />
+								<span className="hidden sm:inline">template_gallery</span>
 							</Button>
-							<Button
-								onClick={handleRun}
-								variant="outline"
-								size="sm"
-								className="font-mono text-xs"
-								disabled={!selectedSample}
-							>
-								<Play className="h-3 w-3 mr-2" />
-								run
-							</Button>
-							<Button
-								onClick={handleSave}
-								variant="outline"
-								size="sm"
-								className="font-mono text-xs"
-								disabled={!selectedSample}
-							>
-								save
-							</Button>
-						</div>
+						)}
 					</div>
 				</div>
 			</header>
 
-			<div className="flex flex-1 overflow-hidden min-h-0">
-				{/* Sidebar - Code Samples List */}
-				<aside className="w-64 bg-black/10 overflow-y-auto">
-					<div className="p-4">
-						<h2 className="text-sm font-semibold font-mono mb-3">
-							samples ({samples.length})
-						</h2>
+			<div className="flex flex-1 overflow-hidden min-h-0 flex-col lg:flex-row">
+				<aside className="w-full lg:w-64 border-b lg:border-b-0 lg:border-r border-border bg-black/20 flex flex-col overflow-hidden shrink-0 h-[30vh] lg:h-auto">
+					<div className="p-3 border-b border-border/50 flex justify-between items-center bg-black/40">
+						<span className="text-xs font-mono text-muted-foreground uppercase tracking-wider">
+							explorer
+						</span>
+						<Tooltip.Root delay={200}>
+							<Tooltip.Trigger
+								render={
+									<Button
+										onClick={() => setViewMode("gallery")}
+										variant="ghost"
+										size="icon"
+										className="h-6 w-6 hover:bg-primary/20 hover:text-primary transition-colors focus:outline-none"
+									>
+										<Plus className="h-4 w-4" />
+									</Button>
+								}
+							/>
+							<Tooltip.Portal>
+								<Tooltip.Positioner sideOffset={4}>
+									<Tooltip.Popup className="bg-black/90 border border-white/10 text-white text-[10px] font-mono px-2 py-1 shadow-xl z-[9999]">
+										New Sketch from Template
+										<Tooltip.Arrow className="fill-black/90" />
+									</Tooltip.Popup>
+								</Tooltip.Positioner>
+							</Tooltip.Portal>
+						</Tooltip.Root>
+					</div>
+					<div className="flex-1 overflow-y-auto custom-scrollbar p-2">
 						{samples.length === 0 ? (
-							<div className="text-xs text-muted-foreground font-mono py-8 text-center">
-								no samples yet.
-								<br />
-								<br />
-								ask the assistant to create one!
+							<div className="text-xs text-muted-foreground font-mono py-8 px-4 text-center opacity-50 border border-dashed border-border/50 m-2">
+								directory_empty
 							</div>
 						) : (
-							<div className="space-y-1">
+							<div className="space-y-0.5">
 								{samples.map((sample) => (
 									<div
 										key={sample.id}
 										role="button"
 										tabIndex={0}
-										className={`w-full p-2 cursor-pointer transition-all text-left group ${
-											selectedSample?.id === sample.id
-												? "bg-sidebar-accent text-sidebar-accent-foreground"
-												: "hover:bg-sidebar-accent/30 text-sidebar-foreground"
+										className={`group relative flex items-center justify-between px-3 py-2 text-xs font-mono rounded-sm transition-all cursor-pointer ${
+											selectedSample?.id === sample.id && viewMode === "editor"
+												? "bg-primary/10 text-primary border border-primary/20"
+												: "text-muted-foreground hover:bg-white/5 hover:text-foreground border border-transparent"
 										}`}
-										onClick={() => setSelectedSample(sample)}
+										onClick={() => {
+											setSelectedSample(sample);
+											setViewMode("editor");
+										}}
 										onKeyDown={(e) => {
 											if (e.key === "Enter" || e.key === " ") {
 												e.preventDefault();
 												setSelectedSample(sample);
+												setViewMode("editor");
 											}
 										}}
 									>
-										<div className="flex items-start justify-between">
-											{editingId === sample.id ? (
-												<div className="flex-1 min-w-0 mr-2">
-													<Input
-														value={editTitle}
-														onChange={(e) => setEditTitle(e.target.value)}
-														onKeyDown={(e) => {
-															if (e.key === "Enter") handleRename();
-															if (e.key === "Escape") setEditingId(null);
-														}}
-														onClick={(e) => e.stopPropagation()}
-														className="h-6 text-xs font-mono py-0 px-1 bg-transparent border-b border-foreground/20 rounded-none focus-visible:ring-0 focus-visible:border-foreground"
-														autoFocus
-														onBlur={handleRename}
-													/>
-												</div>
-											) : (
-												<div className="flex-1 min-w-0">
-													<h3 className="text-xs font-semibold font-mono truncate">
-														{sample.title}
-													</h3>
-													<p className="text-[10px] opacity-70 font-mono mt-1 truncate">
-														{sample.concept}
-													</p>
-												</div>
-											)}
-											<div className="flex gap-1 shrink-0 opacity-0 group-hover:opacity-100 focus-within:opacity-100 transition-opacity">
-												<Button
-													variant="ghost"
-													size="icon"
-													className="h-6 w-6 hover:bg-background/20"
-													onClick={(e) => {
-														e.stopPropagation();
-														startEditing(sample);
-													}}
-												>
-													<Pencil className="h-3 w-3" />
-												</Button>
-												<Button
-													variant="ghost"
-													size="icon"
-													className="h-6 w-6 hover:bg-background/20"
-													onClick={(e) => {
-														e.stopPropagation();
-														handleDelete(sample.id);
-													}}
-												>
-													<Trash2 className="h-3 w-3" />
-												</Button>
+										{editingId === sample.id ? (
+											<Input
+												value={editTitle}
+												onChange={(e) => setEditTitle(e.target.value)}
+												onKeyDown={(e) => {
+													if (e.key === "Enter") handleRename();
+													if (e.key === "Escape") setEditingId(null);
+												}}
+												onClick={(e) => e.stopPropagation()}
+												className="h-6 text-xs font-mono py-0 px-1 bg-black/50 border border-primary/50 rounded-none focus-visible:ring-0 focus-visible:border-primary w-full"
+												autoFocus
+												onBlur={handleRename}
+											/>
+										) : (
+											<div className="flex items-center gap-2 overflow-hidden w-full">
+												<Code2 className="h-3 w-3 shrink-0 opacity-50" />
+												<span className="truncate">{sample.title}</span>
 											</div>
+										)}
+
+										<div
+											className={`absolute right-2 flex gap-1 bg-background/90 backdrop-blur-sm px-1 py-0.5 rounded shadow-sm transition-opacity ${
+												selectedSample?.id === sample.id && viewMode === "editor"
+													? "opacity-100"
+													: "opacity-0 lg:group-hover:opacity-100"
+											} ${editingId === sample.id ? "hidden" : ""}`}
+										>
+											<button
+												type="button"
+												className="p-1 hover:text-primary transition-colors focus:outline-none"
+												onClick={(e) => {
+													e.stopPropagation();
+													startEditing(sample);
+												}}
+											>
+												<Pencil className="h-3 w-3" />
+											</button>
+											<button
+												type="button"
+												className="p-1 hover:text-red-400 transition-colors focus:outline-none"
+												onClick={(e) => {
+													e.stopPropagation();
+													setItemToDelete(sample.id);
+												}}
+											>
+												<Trash2 className="h-3 w-3" />
+											</button>
 										</div>
 									</div>
 								))}
@@ -426,73 +619,207 @@ ${codeContent}
 					</div>
 				</aside>
 
-				{/* Main Content */}
-				<div className="flex-1 flex flex-col">
-					{selectedSample ? (
-						<>
-							{/* Code Editor */}
-							<div className="flex-1 flex flex-col border-b border-border min-h-0">
-								<div className="bg-black/40 px-4 py-2 border-b border-border shrink-0">
-									<div className="flex items-center gap-2">
-										<Code2 className="h-3 w-3 text-muted-foreground" />
-										<span className="text-xs font-mono text-muted-foreground">
-											{selectedSample.language}
-										</span>
-									</div>
-								</div>
-								<ScrollArea className="flex-1 min-h-0">
-									<div className="p-4 bg-black/40">
-										<textarea
-											ref={textareaRef}
-											value={code}
-											onChange={(e) => {
-												setCode(e.target.value);
-												// Auto-resize textarea
-												const target = e.target;
-												target.style.height = "auto";
-												target.style.height = `${target.scrollHeight}px`;
-											}}
-											className="w-full font-mono text-sm text-foreground resize-none focus:outline-none focus:ring-0 bg-transparent border-0 p-0 block [scrollbar-width:none] [-ms-overflow-style:none] [&::-webkit-scrollbar]:hidden"
-											style={{
-												overflow: "hidden",
-												overflowY: "hidden",
-												overflowX: "hidden",
-											}}
-											placeholder="// Your code here..."
-											spellCheck={false}
-											rows={1}
-										/>
-									</div>
-								</ScrollArea>
+				{viewMode === "gallery" ? (
+					<div className="flex-1 overflow-y-auto p-6 md:p-12 bg-[#0a0a0a]">
+						<div className="max-w-4xl mx-auto">
+							<div className="mb-10">
+								<h2 className="text-2xl font-bold font-mono tracking-tight mb-2">
+									Template Gallery
+								</h2>
+								<p className="text-sm text-muted-foreground font-mono border-l-2 border-primary/50 pl-3">
+									Select a starting point for your next WebGL experiment.
+									<br />
+									Each template comes pre-configured with a scene, camera, and
+									render loop.
+								</p>
 							</div>
 
-							{/* Preview */}
-							<div className="flex-1 relative bg-black min-h-0">
-								<iframe
-									key={iframeKey}
-									srcDoc={generateSandboxHTML(code)}
-									className="w-full h-full border-0"
-									sandbox="allow-scripts allow-same-origin"
-									title="Code Preview"
-								/>
-							</div>
-						</>
-					) : (
-						<div className="flex-1 flex items-center justify-center">
-							<div className="text-center">
-								<Code2 className="h-12 w-12 text-muted-foreground mx-auto mb-4" />
-								<p className="text-sm text-muted-foreground font-mono">
-									no sample selected
-								</p>
-								<p className="text-xs text-muted-foreground font-mono mt-2">
-									select a sample from the sidebar or ask the assistant to
-									create one
-								</p>
+							<div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+								{TEMPLATES.map((tpl) => (
+									<button
+										key={tpl.id}
+										onClick={() => handleNewFromTemplate(tpl.code, tpl.title)}
+										className="group text-left p-6 bg-black/40 border border-border hover:border-primary/50 hover:bg-white/5 transition-all duration-300 flex flex-col h-full focus:outline-none focus:ring-1 focus:ring-primary"
+									>
+										<div className="mb-6 flex justify-center py-8 bg-black/60 rounded-sm border border-white/5">
+											{tpl.icon}
+										</div>
+										<h3 className="text-sm font-bold font-mono text-primary/90 mb-3 group-hover:text-primary">
+											{tpl.title}
+										</h3>
+										<p className="text-xs text-muted-foreground font-mono leading-relaxed flex-1">
+											{tpl.description}
+										</p>
+										<div className="mt-6 text-[10px] text-primary/50 font-mono tracking-widest uppercase group-hover:text-primary/80 transition-colors flex items-center gap-2">
+											<span>Initialize</span>
+											<span className="group-hover:translate-x-1 transition-transform">
+												→
+											</span>
+										</div>
+									</button>
+								))}
 							</div>
 						</div>
-					)}
-				</div>
+					</div>
+				) : (
+					<>
+						<div className="flex-1 flex flex-col border-b lg:border-b-0 lg:border-r border-border min-w-0 bg-[#0d1117] relative h-[40vh] lg:h-auto">
+							<div className="h-10 bg-black/40 border-b border-border flex items-center justify-between px-2 sm:px-4 shrink-0 overflow-x-auto [scrollbar-width:none]">
+								<div className="flex items-center gap-2 shrink-0">
+									<div className="px-2 py-1 bg-primary/10 border border-primary/20 text-primary text-[10px] font-mono uppercase tracking-wider hidden sm:block">
+										{selectedSample?.language || "ts"}
+									</div>
+									<span className="text-xs font-mono text-muted-foreground truncate max-w-[120px] sm:max-w-none">
+										{selectedSample?.title}
+									</span>
+								</div>
+								<div className="flex items-center gap-1 sm:gap-2 shrink-0 ml-2">
+									<Button
+										onClick={handleSave}
+										variant="ghost"
+										size="sm"
+										className="h-7 text-[10px] sm:text-xs font-mono uppercase tracking-wider text-muted-foreground hover:text-foreground hover:bg-white/5"
+										disabled={!selectedSample || code === selectedSample.code}
+									>
+										<Save className="h-3 w-3 sm:mr-1.5" />
+										<span className="hidden sm:inline">[Save]</span>
+									</Button>
+
+									<Button
+										onClick={handleRun}
+										variant="outline"
+										size="sm"
+										className="h-7 text-[10px] sm:text-xs font-mono uppercase tracking-wider border-primary/30 text-primary hover:bg-primary hover:text-black transition-all"
+									>
+										<Play className="h-3 w-3 sm:mr-1.5" />
+										<span className="hidden sm:inline">[Run_Code]</span>
+										<span className="sm:hidden">Run</span>
+									</Button>
+								</div>
+							</div>
+
+							<div className="flex-1 relative overflow-hidden group">
+								<div className="absolute inset-0 pointer-events-none opacity-[0.015] mix-blend-overlay z-10 bg-[linear-gradient(transparent_50%,rgba(0,0,0,0.25)_50%)] bg-[length:100%_4px]"></div>
+
+								<div className="absolute left-0 top-0 bottom-0 w-10 sm:w-12 bg-black/20 border-r border-border/50 text-right pr-2 pt-4 select-none pointer-events-none text-muted-foreground/30 font-mono text-[11px] sm:text-[13px] leading-relaxed hidden md:block">
+									{Array.from({
+										length: Math.max(30, code.split("\n").length),
+									}).map((_, i) => (
+										<div key={i}>{i + 1}</div>
+									))}
+								</div>
+
+								<div className="absolute inset-0 w-full h-full md:pl-12 overflow-y-auto custom-scrollbar bg-transparent">
+									<Editor
+										value={code}
+										onValueChange={(code) => setCode(code)}
+										highlight={(code) =>
+											Prism.highlight(
+												code,
+												Prism.languages.typescript,
+												"typescript",
+											)
+										}
+										padding={16}
+										style={{
+											fontFamily: '"JetBrains Mono", monospace',
+											fontSize: "13px",
+											lineHeight: "1.6",
+											backgroundColor: "transparent",
+											minHeight: "100%",
+										}}
+										textareaClassName="focus:outline-none"
+										className="w-full text-[#e2e8f0]"
+									/>
+								</div>
+							</div>
+						</div>
+
+						<div className="w-full lg:w-[40%] xl:w-[45%] flex-1 lg:flex-none relative bg-black shrink-0 overflow-hidden group h-[50vh] lg:h-auto">
+							<div className="absolute top-0 left-0 right-0 h-8 bg-gradient-to-b from-black/80 to-transparent z-10 flex items-center px-3 pointer-events-none">
+								<span className="text-[10px] font-mono text-white/50 tracking-widest uppercase">
+									{"> output_canvas"}
+								</span>
+							</div>
+
+							<iframe
+								key={iframeKey}
+								srcDoc={generateSandboxHTML(code)}
+								className={`w-full h-full border-0 bg-black transition-opacity duration-300 ${isCompiling ? "opacity-30" : "opacity-100"}`}
+								sandbox="allow-scripts allow-same-origin"
+								title="Code Preview"
+							/>
+							<div
+								className={`absolute inset-0 bg-primary/10 backdrop-blur-sm flex flex-col items-center justify-center transition-all duration-300 pointer-events-none ${
+									isCompiling
+										? "opacity-100 visible scale-100"
+										: "opacity-0 invisible scale-105"
+								}`}
+							>
+								<div className="w-10 h-10 sm:w-12 sm:h-12 border-2 border-primary/50 border-t-primary rounded-full animate-spin mb-4" />
+								<span className="text-primary font-mono text-[10px] sm:text-xs tracking-widest uppercase animate-pulse">
+									compiling...
+								</span>
+							</div>
+						</div>
+					</>
+				)}
 			</div>
+
+			<style
+				dangerouslySetInnerHTML={{
+					__html: `
+				.custom-scrollbar::-webkit-scrollbar {
+					width: 8px;
+					height: 8px;
+				}
+				.custom-scrollbar::-webkit-scrollbar-track {
+					background: rgba(0,0,0,0.2);
+				}
+				.custom-scrollbar::-webkit-scrollbar-thumb {
+					background: rgba(255,255,255,0.1);
+					border-radius: 4px;
+				}
+				.custom-scrollbar::-webkit-scrollbar-thumb:hover {
+					background: rgba(255,255,255,0.2);
+				}
+				
+				/* Prism JS Overrides to match our dark theme */
+				code[class*="language-"], pre[class*="language-"] {
+					text-shadow: none !important;
+					color: #e2e8f0 !important;
+				}
+				.token.comment, .token.prolog, .token.doctype, .token.cdata {
+					color: #64748b !important;
+					font-style: italic;
+				}
+				.token.punctuation {
+					color: #94a3b8 !important;
+				}
+				.token.namespace {
+					opacity: .7;
+				}
+				.token.property, .token.tag, .token.boolean, .token.number, .token.constant, .token.symbol, .token.deleted {
+					color: #f472b6 !important; /* Fuchsia */
+				}
+				.token.selector, .token.attr-name, .token.string, .token.char, .token.builtin, .token.inserted {
+					color: #2dd4bf !important; /* Cyan */
+				}
+				.token.operator, .token.entity, .token.url, .language-css .token.string, .style .token.string {
+					color: #e2e8f0 !important;
+				}
+				.token.atrule, .token.attr-value, .token.keyword {
+					color: #38bdf8 !important; /* Teal */
+				}
+				.token.function, .token.class-name {
+					color: #fbbf24 !important; /* Light blue/yellow */
+				}
+				.token.regex, .token.important, .token.variable {
+					color: #fb923c !important; /* Orange */
+				}
+			`,
+				}}
+			/>
 		</div>
 	);
 }
